@@ -1,5 +1,8 @@
 package mygame;
 
+import daten.D;
+import daten.D_OK;
+import daten.D_Fehler;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;

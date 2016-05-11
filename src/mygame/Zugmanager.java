@@ -4,6 +4,7 @@
  */
 package mygame;
 
+import daten.D;
 import restClient.BackendSpielStub;
 import java.util.ArrayList;
 

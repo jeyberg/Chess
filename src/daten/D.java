@@ -1,9 +1,10 @@
-package mygame;
+package daten;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Properties;
 import java.util.Set;
+import mygame.Xml;
 import mygame.Xml;
 
 // Basis-Datencontainer
