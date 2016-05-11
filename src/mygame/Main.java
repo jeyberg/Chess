@@ -256,6 +256,10 @@ public class Main extends SimpleApplication implements ScreenController {
             setKameraPosition(zmngr.getIsWeiss());
         }
     }
+    
+    public void testMethod(){
+        System.out.println("Hello Git.");
+    }
 
     public void loadGame() {
         String s = getXmlMessage(stub.ladenSpiel("somepath"));
