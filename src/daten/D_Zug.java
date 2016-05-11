@@ -1,6 +1,6 @@
-package mygame;
+package daten;
 
-import mygame.D;
+import daten.D;
 
 public class D_Zug extends D{
 	public D_Zug(){

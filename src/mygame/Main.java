@@ -1,5 +1,6 @@
 package mygame;
 
+import daten.D;
 import restClient.BackendSpielAdminStub;
 import restClient.BackendSpielStub;
 import com.jme3.app.SimpleApplication;

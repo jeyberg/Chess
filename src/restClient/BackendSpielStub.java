@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 
-import mygame.D;
+import daten.D;
 import mygame.Xml;
 import mygame.Xml;
 import restClient.iBackendSpiel;

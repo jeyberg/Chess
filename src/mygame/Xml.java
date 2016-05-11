@@ -1,5 +1,6 @@
 package mygame;
 
+import daten.*;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
