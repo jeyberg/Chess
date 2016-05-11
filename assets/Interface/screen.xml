@@ -8,7 +8,10 @@
     <screen id="spiel" controller="mygame.Main" >
         <layer id="layer2" backgroundColor="#0000" childLayout="vertical" visibleToMouse="true" height="85%" width="25%">
             <panel id="history" height="85%" width="25%" align="right" backgroundColor="#fff1" childLayout="center">
-                
+                <text text="Historie: ${CALL.getHistorie()}" font="Interface/Fonts/Arial.fnt" height="100%" width="100%" wrap="true"/>
+                <control name="button" label="Weiterspielen" id="weiterspielen" align="center" valign="bottom">
+                    <interact onClick=""/>
+                </control>
             </panel>
         </layer>
         <layer id="layer1" backgroundColor="#0000" childLayout="vertical" visibleToMouse="true">
