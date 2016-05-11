@@ -3,7 +3,6 @@ package mygame;
 import restClient.BackendSpielAdminStub;
 import restClient.BackendSpielStub;
 import com.jme3.app.SimpleApplication;
-import com.jme3.collision.CollisionResult;
 import com.jme3.collision.CollisionResults;
 import com.jme3.font.BitmapText;
 import com.jme3.input.KeyInput;
@@ -11,27 +10,20 @@ import com.jme3.input.MouseInput;
 import com.jme3.input.controls.ActionListener;
 import com.jme3.input.controls.KeyTrigger;
 import com.jme3.input.controls.MouseButtonTrigger;
-import com.jme3.light.DirectionalLight;
 import com.jme3.material.Material;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.Ray;
-import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
 import com.jme3.niftygui.NiftyJmeDisplay;
 import com.jme3.renderer.RenderManager;
 import com.jme3.scene.Geometry;
-import com.jme3.scene.Mesh;
 import com.jme3.scene.Node;
-import com.jme3.scene.Spatial;
 import com.jme3.scene.shape.Box;
-import com.jme3.scene.shape.Cylinder;
 import com.jme3.scene.shape.Dome;
-import com.jme3.scene.shape.PQTorus;
 import com.jme3.scene.shape.Sphere;
 import de.lessvoid.nifty.Nifty;
 import de.lessvoid.nifty.controls.RadioButton;
 import de.lessvoid.nifty.controls.TextField;
-import de.lessvoid.nifty.elements.render.TextRenderer;
 import de.lessvoid.nifty.screen.Screen;
 import de.lessvoid.nifty.screen.ScreenController;
 import java.io.IOException;
@@ -40,8 +32,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Timer;
-import java.util.TimerTask;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.jdom2.Document;
@@ -49,11 +39,6 @@ import org.jdom2.Element;
 import org.jdom2.JDOMException;
 import org.jdom2.input.SAXBuilder;
 
-/**
- * test
- *
- * @author normenhansen
- */
 public class Main extends SimpleApplication implements ScreenController {
 
     private Node chessboard = new Node("chessboard");
@@ -75,20 +60,15 @@ public class Main extends SimpleApplication implements ScreenController {
     public static void main(String[] args) {
         Main app = new Main();
         app.start();
-
-
-
     }
 
     @Override
     public void simpleInitApp() {
         flyCam.setDragToRotate(true);
-//        cam.setLocation(new Vector3f(25.0f, 8.0f, 0.0f));
-//        cam.lookAt(new Vector3f(-30.0f, 0.0f, 0.0f), new Vector3f(0.0f, 0.0f, 0f));
+        flyCam.setMoveSpeed(15f);
         initGui();
         initCrossHairs();
         initKey();
-
     }
 
     @Override
@@ -119,6 +99,7 @@ public class Main extends SimpleApplication implements ScreenController {
         inputManager.addListener(actionListener, "Klick");
         inputManager.addListener(actionListener, "Mouse_Mode");
     }
+    
     private ActionListener actionListener = new ActionListener() {
         public void onAction(String name, boolean isPressed, float tpf) {
             if (name.equals("Klick") && !isPressed && zmngr.getAmZug(spielStub)) {
