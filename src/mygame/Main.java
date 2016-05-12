@@ -279,6 +279,18 @@ public class Main extends SimpleApplication implements ScreenController {
     public void onEndScreen() {
         //To change body of generated methods, choose Tools | Templates.
     }
+    
+        
+    public ArrayList<String> getHistorie(){
+        String xml = spielStub.getZugHistorie();
+        ArrayList<D> data = Xml.toArray(xml);
+        ArrayList<String> historie = new ArrayList<String>();
+        for(D d : data){
+            String s = d.getProperties().getProperty("zug");
+            historie.add(s);
+        }
+        return historie;
+    }
 
     void getLegalPositions(String pos) {
         String xml = spielStub.getErlaubteZuege(pos);
@@ -305,7 +317,9 @@ public class Main extends SimpleApplication implements ScreenController {
             sp.setUserData("markiert", true);
         }
     }
+    
 
+    
     void resetTileColor() {
         if (!coloredTiles.isEmpty()) {
             for (Map.Entry<String, Material> entry : coloredTiles.entrySet()) {
@@ -318,7 +332,7 @@ public class Main extends SimpleApplication implements ScreenController {
             coloredTiles.clear();
         }
     }
-
+    
     void draw(String from, String to) {
         String xml = spielStub.ziehe(from, to);
         ArrayList<D> data = Xml.toArray(xml);
