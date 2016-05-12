@@ -9,7 +9,6 @@ import javax.ws.rs.client.ClientBuilder;
 
 import daten.D;
 import mygame.Xml;
-import mygame.Xml;
 import restClient.iBackendSpielAdmin;
 
 public class BackendSpielAdminStub implements iBackendSpielAdmin{
