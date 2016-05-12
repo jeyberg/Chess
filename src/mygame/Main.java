@@ -13,6 +13,7 @@ import com.jme3.input.controls.KeyTrigger;
 import com.jme3.input.controls.MouseButtonTrigger;
 import com.jme3.material.Material;
 import com.jme3.math.ColorRGBA;
+import com.jme3.math.Matrix3f;
 import com.jme3.math.Ray;
 import com.jme3.math.Vector3f;
 import com.jme3.niftygui.NiftyJmeDisplay;
@@ -100,7 +101,6 @@ public class Main extends SimpleApplication implements ScreenController {
         inputManager.addListener(actionListener, "Klick");
         inputManager.addListener(actionListener, "Mouse_Mode");
     }
-    
     private ActionListener actionListener = new ActionListener() {
         public void onAction(String name, boolean isPressed, float tpf) {
             if (name.equals("Klick") && !isPressed && zmngr.getAmZug(spielStub)) {
@@ -139,8 +139,7 @@ public class Main extends SimpleApplication implements ScreenController {
         BitmapText ch = new BitmapText(guiFont, false);
         ch.setSize(guiFont.getCharSet().getRenderedSize() * 2);
         ch.setText("+");
-        ch.setLocalTranslation(
-                settings.getWidth() / 2 - ch.getLineWidth() / 2, settings.getHeight() / 2 + ch.getLineHeight() / 2, 0);
+        ch.setLocalTranslation(settings.getWidth() / 2 - ch.getLineWidth() / 2, settings.getHeight() / 2 + ch.getLineHeight() / 2, 0); //settings.getWidth() / 2 - ch.getLineWidth() / 2, settings.getHeight() / 2 + ch.getLineHeight() / 2, 0
         guiNode.attachChild(ch);
     }
 
@@ -215,6 +214,7 @@ public class Main extends SimpleApplication implements ScreenController {
             if (daten.get(0).getProperties().getProperty("klasse").equals("D_OK")) {
                 initPos();
                 initBoard();
+                initBrettRand();
                 figuren();
                 nifty.gotoScreen("spiel");
                 setKameraPosition(zmngr.getIsWeiss());
@@ -238,7 +238,7 @@ public class Main extends SimpleApplication implements ScreenController {
             setKameraPosition(zmngr.getIsWeiss());
         }
     }
-    
+
     public void loadGame() {
         String s = getXmlMessage(stub.ladenSpiel("somepath"));
         System.out.println(s);
@@ -279,13 +279,12 @@ public class Main extends SimpleApplication implements ScreenController {
     public void onEndScreen() {
         //To change body of generated methods, choose Tools | Templates.
     }
-    
-        
-    public ArrayList<String> getHistorie(){
+
+    public ArrayList<String> getHistorie() {
         String xml = spielStub.getZugHistorie();
         ArrayList<D> data = Xml.toArray(xml);
         ArrayList<String> historie = new ArrayList<String>();
-        for(D d : data){
+        for (D d : data) {
             String s = d.getProperties().getProperty("zug");
             historie.add(s);
         }
@@ -317,9 +316,7 @@ public class Main extends SimpleApplication implements ScreenController {
             sp.setUserData("markiert", true);
         }
     }
-    
 
-    
     void resetTileColor() {
         if (!coloredTiles.isEmpty()) {
             for (Map.Entry<String, Material> entry : coloredTiles.entrySet()) {
@@ -332,7 +329,7 @@ public class Main extends SimpleApplication implements ScreenController {
             coloredTiles.clear();
         }
     }
-    
+
     void draw(String from, String to) {
         String xml = spielStub.ziehe(from, to);
         ArrayList<D> data = Xml.toArray(xml);
@@ -398,6 +395,23 @@ public class Main extends SimpleApplication implements ScreenController {
             letter = 'a';
         }
         System.out.println(positions);
+    }
+
+    public void initBrettRand() {
+        int x = -9;
+        int z = -9;
+        char buchstabe = 'a';
+        int nummer = 1;
+        Material black = new Material(assetManager,
+                "Common/MatDefs/Misc/Unshaded.j3md");
+        black.setColor("Color", ColorRGBA.DarkGray);
+        guiFont = assetManager.loadFont("Interface/Fonts/Default.fnt");
+        BitmapText ch = new BitmapText(guiFont, false);
+        ch.setSize(2f);
+        ch.setText(String.valueOf(buchstabe));
+        ch.setLocalTranslation(x, 0, z);
+        ch.rotate(-80, 0, 0);
+        rootNode.attachChild(ch);
     }
 
     Geometry getGeometry(String type, String pos) {
