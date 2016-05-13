@@ -13,7 +13,6 @@ import com.jme3.input.controls.KeyTrigger;
 import com.jme3.input.controls.MouseButtonTrigger;
 import com.jme3.material.Material;
 import com.jme3.math.ColorRGBA;
-import com.jme3.math.Matrix3f;
 import com.jme3.math.Ray;
 import com.jme3.math.Vector3f;
 import com.jme3.niftygui.NiftyJmeDisplay;
@@ -115,8 +114,8 @@ public class Main extends SimpleApplication implements ScreenController {
                         if (g.getUserData("farbe").equals("weiss") && zmngr.getIsWeiss()
                                 || g.getUserData("farbe").equals("schwarz") && !zmngr.getIsWeiss()) {
                             getLegalPositions(gName);
-                        }else {
-                            if(coloredTiles.containsKey(gName)){
+                        } else {
+                            if (coloredTiles.containsKey(gName)) {
                                 draw(selectedTile, gName);
                             }
                         }
@@ -216,7 +215,8 @@ public class Main extends SimpleApplication implements ScreenController {
             if (daten.get(0).getProperties().getProperty("klasse").equals("D_OK")) {
                 initPos();
                 initBoard();
-                initBrettRand();
+                initBrettRandZiffer(true);
+                initBrettRandZiffer(false);
                 figuren();
                 nifty.gotoScreen("spiel");
                 setKameraPosition(zmngr.getIsWeiss());
@@ -399,20 +399,55 @@ public class Main extends SimpleApplication implements ScreenController {
         System.out.println(positions);
     }
 
-    public void initBrettRand() {
-        int x = -9;
-        int z = -9;
+    public void initBrettRandZiffer(Boolean macheZiffer) {
+        float x;
+        float z;
+        if (macheZiffer) {
+            x = -9f;
+            z = -8f;
+        } else {
+            z = -10.5f;
+            x = -7f;
+        }
         char buchstabe = 'a';
-        int nummer = 1;
-        Material black = new Material(assetManager,
-                "Common/MatDefs/Misc/Unshaded.j3md");
-        black.setColor("Color", ColorRGBA.DarkGray);
+        int nummer = 8;
         guiFont = assetManager.loadFont("Interface/Fonts/Default.fnt");
-        BitmapText ch = new BitmapText(guiFont, false);
-        ch.setSize(2f);
-        ch.setText(String.valueOf(buchstabe));
-        ch.setLocalTranslation(x, 0, z);
-        rootNode.attachChild(ch);
+        for (int i = 0; i < 2; i++) {
+            for (int j = 0; j < 8; j++) {
+                BitmapText ch = new BitmapText(guiFont, false);
+                ch.setSize(2f);
+                if (macheZiffer) {
+                    ch.setText(String.valueOf(nummer));
+                } else {
+                    ch.setText(String.valueOf(buchstabe));
+                }
+                if (i < 1) {
+                    ch.setLocalTranslation(x - 0.5f, 0, z);
+                } else {
+                    ch.setLocalTranslation(x - 0.5f, 0, z);
+                }
+                ch.rotate(-1.5708f, 0, 0);
+                rootNode.attachChild(ch);
+                if (macheZiffer) {
+                    z += 2;
+                    nummer--;
+                } else {
+                    x += 2;
+                    buchstabe++;
+                }
+            }
+            if (macheZiffer) {
+                nummer = 8;
+                x *= -1;
+                z = -8f;
+            } else {
+                buchstabe = 'a';
+                x = -7;
+                z = 8;
+            }
+
+        }
+
     }
 
     Geometry getGeometry(String type, String pos) {

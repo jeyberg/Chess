@@ -40,7 +40,7 @@ import org.jdom2.Element;
 import org.jdom2.JDOMException;
 import org.jdom2.input.SAXBuilder;
 
-public class Main extends SimpleApplication implements ScreenController {
+public class Main1 extends SimpleApplication implements ScreenController {
 
     private Node chessboard = new Node("chessboard");
     private Node figurenW = new Node("figurenW");
@@ -59,7 +59,7 @@ public class Main extends SimpleApplication implements ScreenController {
     private int anzahlZeuge = 0;
 
     public static void main(String[] args) {
-        Main app = new Main();
+        Main1 app = new Main1();
         app.start();
     }
 
