@@ -6,8 +6,8 @@ import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 
 import daten.D;
-import mygame.Xml;
-import mygame.Xml;
+import daten.Xml;
+import daten.Xml;
 import restClient.iBackendSpiel;
 
 

@@ -1,4 +1,4 @@
-package mygame;
+package daten;
 
 import daten.D;
 import daten.D_OK;
@@ -10,6 +10,7 @@ import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import mygame.Parameter;
 import mygame.Parameter;
 
 public class Xml {

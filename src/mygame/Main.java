@@ -1,5 +1,6 @@
 package mygame;
 
+import daten.Xml;
 import daten.D;
 import restClient.BackendSpielAdminStub;
 import restClient.BackendSpielStub;
@@ -246,26 +247,27 @@ public class Main extends SimpleApplication implements ScreenController {
     
     
     public ArrayList<String> getHistorie(){
-        
-        String xml = spielStub.getZugHistorie();
-        ArrayList<D> daten = Xml.toArray(xml);
-        ArrayList<String> zugHistorie = new ArrayList<String>();
+        ArrayList<D> zugHistorie = Xml.toArray(spielStub.getZugHistorie());
+        ArrayList<String> historie = new ArrayList<String>();
         zugHistorie.clear();
-        
-        for(D d : daten){
-            String zug = d.getProperties().getProperty("zug");
+ 
+       
+        for(D d : zugHistorie){
+            String zug = d.getString("zug");
             if((zug != null) && (zug.length() > 0)){
-                zugHistorie.add(zug);
+                historie.add(zug);
             }
         }
-        return zugHistorie;  
+        return historie;  
     }
     
     
     
     public ArrayList<String> getDaten(){
+        ArrayList<D> data = Xml.toArray(spielStub.getZugHistorie());
         ArrayList<String> daten = new ArrayList<String>();
         daten.clear();
+     
 
         return daten;
         /*String xml = spielStub.getSpielDaten();
