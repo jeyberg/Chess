@@ -410,7 +410,6 @@ public class Main extends SimpleApplication implements ScreenController {
         ch.setSize(2f);
         ch.setText(String.valueOf(buchstabe));
         ch.setLocalTranslation(x, 0, z);
-        ch.rotate(-80, 0, 0);
         rootNode.attachChild(ch);
     }
 
