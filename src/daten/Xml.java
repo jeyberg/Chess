@@ -1,8 +1,5 @@
 package daten;
 
-import daten.D;
-import daten.D_OK;
-import daten.D_Fehler;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
@@ -10,7 +7,7 @@ import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import mygame.Parameter;
+
 import mygame.Parameter;
 
 public class Xml {

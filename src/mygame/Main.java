@@ -50,8 +50,8 @@ public class Main extends SimpleApplication implements ScreenController {
     private Node chessboard = new Node("chessboard");
     private Node figurenW = new Node("figurenW");
     private Node figurenS = new Node("figurenS");
-    private static BackendSpielAdminStub stub = null; // = new BackendSpielAdminStub("http://192.168.56.1:8000")
-    private static BackendSpielStub spielStub = null; // = new BackendSpielStub("http://192.168.56.1:8000");
+    private static BackendSpielAdminStub stub; // = new BackendSpielAdminStub("http://192.168.56.1:8000")
+    private static BackendSpielStub spielStub; // = new BackendSpielStub("http://192.168.56.1:8000");
     private Document doc;
     private SAXBuilder builder = new SAXBuilder();
     private Nifty nifty;
@@ -246,37 +246,33 @@ public class Main extends SimpleApplication implements ScreenController {
     }
     
     
-    public ArrayList<String> getHistorie(){
-        ArrayList<D> zugHistorie = Xml.toArray(spielStub.getZugHistorie());
-        ArrayList<String> historie = new ArrayList<String>();
-        zugHistorie.clear();
- 
-       
-        for(D d : zugHistorie){
-            String zug = d.getString("zug");
-            if((zug != null) && (zug.length() > 0)){
-                historie.add(zug);
+    public List<String> getHistorie(){
+        //String xml = spielStub.getZugHistorie();
+        List<String> historie = new ArrayList<String>();
+        if(spielStub.getZugHistorie() != null){
+            ArrayList<D> zugHistorie = Xml.toArray(spielStub.getZugHistorie());
+            for(D d : zugHistorie){
+                String zug = d.getProperties().getProperty("zug");
+                if((zug != null) && (zug.length() > 0)){
+                    historie.add(zug);
+                }
             }
         }
-        return historie;  
+        return historie;
     }
     
-    
-    
-    public ArrayList<String> getDaten(){
-        ArrayList<D> data = Xml.toArray(spielStub.getZugHistorie());
-        ArrayList<String> daten = new ArrayList<String>();
-        daten.clear();
-     
-
-        return daten;
-        /*String xml = spielStub.getSpielDaten();
+    public List<String> getDaten(){
+        String xml = spielStub.getSpielDaten();
+        List<String> daten = new ArrayList<String>();
         ArrayList<D> data = Xml.toArray(xml);
-        ArrayList<String> spielDaten = new ArrayList<String>();
-            String s = data.get(0).getProperties().getProperty("status");
-            spielDaten.add(s);
-        return spielDaten;*/
+        for(D d : data){
+            String s = d.getProperties().getProperty("status");
+            daten.add(s);
+        }
+        return daten;
     }
+    
+
     
     public void loadGame() {
         String s = getXmlMessage(stub.ladenSpiel("somepath"));
@@ -330,6 +326,7 @@ public class Main extends SimpleApplication implements ScreenController {
         selectedTile = pos;
         changeTileColor(positions);
     }
+    
 
     void changeTileColor(List<String> plist) {
         resetTileColor();
