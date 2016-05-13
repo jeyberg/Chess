@@ -7,8 +7,7 @@ import javax.ws.rs.client.ClientBuilder;
 
 import daten.D;
 import daten.Xml;
-import daten.Xml;
-import restClient.iBackendSpiel;
+
 
 
 public class BackendSpielStub implements iBackendSpiel{
