@@ -22,6 +22,8 @@ import com.jme3.scene.Node;
 import com.jme3.scene.shape.Box;
 import com.jme3.scene.shape.Dome;
 import com.jme3.scene.shape.Sphere;
+import daten.D_Spiel;
+import daten.D_ZugHistorie;
 import de.lessvoid.nifty.Nifty;
 import de.lessvoid.nifty.controls.RadioButton;
 import de.lessvoid.nifty.controls.TextField;
@@ -31,6 +33,7 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
@@ -39,6 +42,7 @@ import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
 import org.jdom2.input.SAXBuilder;
+
 
 public class Main extends SimpleApplication implements ScreenController {
 
@@ -57,6 +61,7 @@ public class Main extends SimpleApplication implements ScreenController {
     private Zugmanager zmngr;
     private ArrayList<D> aktuelleBelegung;
     private int anzahlZeuge = 0;
+
 
     public static void main(String[] args) {
         Main app = new Main();
@@ -85,7 +90,6 @@ public class Main extends SimpleApplication implements ScreenController {
                     anzahlZeuge = zeuge;
                 }
             }
-
         }
     }
 
@@ -207,8 +211,8 @@ public class Main extends SimpleApplication implements ScreenController {
         String text = scrn.findNiftyControl("ip", TextField.class).getRealText();
         boolean isWeiss = scrn.findNiftyControl("weiss", RadioButton.class).isActivated();
         if (!text.equals("")) {
-            stub = new BackendSpielAdminStub("http://" + text);
-            spielStub = new BackendSpielStub("http://" + text);
+            stub = new BackendSpielAdminStub("http://" + text + ":8000");
+            spielStub = new BackendSpielStub("http://" + text + ":8000");
             this.zmngr = new Zugmanager(isWeiss);
             String s = stub.neuesSpiel();
             ArrayList<D> daten = Xml.toArray(s);
@@ -228,15 +232,48 @@ public class Main extends SimpleApplication implements ScreenController {
         String text = scrn.findNiftyControl("ip", TextField.class).getRealText();
         boolean isWeiss = scrn.findNiftyControl("weiss", RadioButton.class).isActivated();
         if (!text.equals("")) {
-            stub = new BackendSpielAdminStub("http://" + text);
-            spielStub = new BackendSpielStub("http://" + text);
+            stub = new BackendSpielAdminStub("http://" + text + ":8000");
+            spielStub = new BackendSpielStub("http://" + text + ":8000");
             this.zmngr = new Zugmanager(isWeiss);
             initPos();
             initBoard();
             figuren();
             nifty.gotoScreen("spiel");
             setKameraPosition(zmngr.getIsWeiss());
+            
         }
+    }
+    
+    
+    public ArrayList<String> getHistorie(){
+        
+        String xml = spielStub.getZugHistorie();
+        ArrayList<D> daten = Xml.toArray(xml);
+        ArrayList<String> zugHistorie = new ArrayList<String>();
+        zugHistorie.clear();
+        
+        for(D d : daten){
+            String zug = d.getProperties().getProperty("zug");
+            if((zug != null) && (zug.length() > 0)){
+                zugHistorie.add(zug);
+            }
+        }
+        return zugHistorie;  
+    }
+    
+    
+    
+    public ArrayList<String> getDaten(){
+        ArrayList<String> daten = new ArrayList<String>();
+        daten.clear();
+
+        return daten;
+        /*String xml = spielStub.getSpielDaten();
+        ArrayList<D> data = Xml.toArray(xml);
+        ArrayList<String> spielDaten = new ArrayList<String>();
+            String s = data.get(0).getProperties().getProperty("status");
+            spielDaten.add(s);
+        return spielDaten;*/
     }
     
     public void loadGame() {
@@ -278,18 +315,6 @@ public class Main extends SimpleApplication implements ScreenController {
 
     public void onEndScreen() {
         //To change body of generated methods, choose Tools | Templates.
-    }
-    
-        
-    public ArrayList<String> getHistorie(){
-        String xml = spielStub.getZugHistorie();
-        ArrayList<D> data = Xml.toArray(xml);
-        ArrayList<String> historie = new ArrayList<String>();
-        for(D d : data){
-            String s = d.getProperties().getProperty("zug");
-            historie.add(s);
-        }
-        return historie;
     }
 
     void getLegalPositions(String pos) {

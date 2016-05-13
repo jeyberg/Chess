@@ -7,8 +7,8 @@
     <useControls filename="nifty-default-controls.xml" />
     <screen id="spiel" controller="mygame.Main" >
         <layer id="layer2" backgroundColor="#0000" childLayout="vertical" visibleToMouse="true" height="85%" width="25%">
-            <panel id="history" height="85%" width="25%" align="right" backgroundColor="#fff1" childLayout="center">
-                <text text="Historie: ${CALL.getHistorie()}" font="Interface/Fonts/Arial.fnt" height="100%" width="100%" wrap="true"/>
+            <panel id="historiePanel" height="85%" width="25%" align="right" backgroundColor="#fff1" childLayout="center">
+                <text id="historie" text="Historie: ${CALL.getHistorie()}" font="Interface/Fonts/Arial.fnt" height="100%" width="100%" wrap="true"/>
                 <control name="button" label="Weiterspielen" id="weiterspielen" align="center" valign="bottom">
                     <interact onClick=""/>
                 </control>
@@ -32,7 +32,7 @@
             <panel id="board" height="80%" width="75%" align="left" backgroundColor="#f8f1" childLayout="center">
             </panel>            
             <panel id="messages" height="15%" width="100%" align="center" backgroundColor="#ff81" childLayout="center">
-                <text name="texts" text="" font="Interface/Fonts/Arial.fnt" height="100%" width="100%" />
+                <text name="texts" text="Daten: ${CALL.getDaten()}" font="Interface/Fonts/Arial.fnt" height="100%" width="100%" />
             </panel>
         </layer>        
     </screen>

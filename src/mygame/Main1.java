@@ -22,6 +22,8 @@ import com.jme3.scene.Node;
 import com.jme3.scene.shape.Box;
 import com.jme3.scene.shape.Dome;
 import com.jme3.scene.shape.Sphere;
+import daten.D_Spiel;
+import daten.D_ZugHistorie;
 import de.lessvoid.nifty.Nifty;
 import de.lessvoid.nifty.controls.RadioButton;
 import de.lessvoid.nifty.controls.TextField;
@@ -31,6 +33,7 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
@@ -40,7 +43,7 @@ import org.jdom2.Element;
 import org.jdom2.JDOMException;
 import org.jdom2.input.SAXBuilder;
 
-public class Main extends SimpleApplication implements ScreenController {
+public class Main1 extends SimpleApplication implements ScreenController {
 
     private Node chessboard = new Node("chessboard");
     private Node figurenW = new Node("figurenW");
@@ -59,7 +62,7 @@ public class Main extends SimpleApplication implements ScreenController {
     private int anzahlZeuge = 0;
 
     public static void main(String[] args) {
-        Main app = new Main();
+        Main1 app = new Main1();
         app.start();
     }
 
@@ -236,7 +239,19 @@ public class Main extends SimpleApplication implements ScreenController {
             figuren();
             nifty.gotoScreen("spiel");
             setKameraPosition(zmngr.getIsWeiss());
+            isWeiss = scrn.findNiftyControl("weiss", RadioButton.class).isEnabled();
         }
+    }
+    
+    public List<String> getHistorie(){
+        String xml = spielStub.getZugHistorie();
+        List<D> data = Xml.toArray(xml);
+        List<String> historie = new ArrayList<String>();
+        for(D d : data){
+            String s = d.getProperties().getProperty("zug");
+            historie.add(s);
+        }
+        return historie;
     }
     
     public void loadGame() {
@@ -280,17 +295,18 @@ public class Main extends SimpleApplication implements ScreenController {
         //To change body of generated methods, choose Tools | Templates.
     }
     
-        
-    public ArrayList<String> getHistorie(){
+    /*public ArrayList<String> getHistorie() {
         String xml = spielStub.getZugHistorie();
-        ArrayList<D> data = Xml.toArray(xml);
-        ArrayList<String> historie = new ArrayList<String>();
-        for(D d : data){
-            String s = d.getProperties().getProperty("zug");
-            historie.add(s);
+        ArrayList<D_Spiel> daten = new ArrayList<D_Spiel>();
+	ArrayList<String> zugHistorie=new ArrayList<String>();
+        for (D_Spiel d : daten){
+            daten.
         }
-        return historie;
-    }
+	for(int i=1;i<=daten.getInt("anzahlZuege");i++){
+		zugHistorie.add(sp.getZugAlsNotation(i));			
+	}
+	return zugHistorie;
+    }*/
 
     void getLegalPositions(String pos) {
         String xml = spielStub.getErlaubteZuege(pos);
