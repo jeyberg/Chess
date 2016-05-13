@@ -114,9 +114,11 @@ public class Main extends SimpleApplication implements ScreenController {
                     if (g.getUserData("typ").equals("figur")) {
                         if (g.getUserData("farbe").equals("weiss") && zmngr.getIsWeiss()
                                 || g.getUserData("farbe").equals("schwarz") && !zmngr.getIsWeiss()) {
-                            gName = g.getName();
-                            gName = gName.substring(gName.length() - 2);
                             getLegalPositions(gName);
+                        }else {
+                            if(coloredTiles.containsKey(gName)){
+                                draw(selectedTile, gName);
+                            }
                         }
                     } else if (g.getUserData("typ").equals("kachel")) {
                         if (g.getUserData("markiert")) {
