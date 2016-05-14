@@ -23,6 +23,7 @@ import com.jme3.scene.shape.Box;
 import com.jme3.scene.shape.Dome;
 import com.jme3.scene.shape.Sphere;
 import de.lessvoid.nifty.Nifty;
+import de.lessvoid.nifty.controls.ListBox;
 import de.lessvoid.nifty.controls.RadioButton;
 import de.lessvoid.nifty.controls.TextField;
 import de.lessvoid.nifty.screen.Screen;
@@ -82,6 +83,7 @@ public class Main extends SimpleApplication implements ScreenController {
                 int zeuge = Integer.parseInt(s);
                 if (zeuge > anzahlZeuge) {
                     figuren();
+                    aktualisiereHistorie();
                     anzahlZeuge = zeuge;
                 }
             }
@@ -221,7 +223,6 @@ public class Main extends SimpleApplication implements ScreenController {
                 nifty.gotoScreen("spiel");
                 setKameraPosition(zmngr.getIsWeiss());
             }
-            System.out.println(daten);
         }
     }
 
@@ -236,6 +237,7 @@ public class Main extends SimpleApplication implements ScreenController {
             initPos();
             initBoard();
             figuren();
+            aktualisiereHistorie();
             nifty.gotoScreen("spiel");
             setKameraPosition(zmngr.getIsWeiss());
         }
@@ -339,6 +341,7 @@ public class Main extends SimpleApplication implements ScreenController {
             resetTileColor();
             figuren();
             zmngr.setAmZug(false);
+            //aktualisiereHistorie();
         } else {
             getLegalPositions(to);
         }
@@ -481,5 +484,19 @@ public class Main extends SimpleApplication implements ScreenController {
             cam.setLocation(new Vector3f(0f, 10f, -25f));
         }
         cam.lookAt(new Vector3f(0f, 0f, 0f), Vector3f.UNIT_Y);
+    }
+
+    public void aktualisiereHistorie() {
+        int index;
+        String xml = spielStub.getZugHistorie();
+        if (xml != null) {
+            ArrayList<D> daten = Xml.toArray(xml);
+            Screen screen = nifty.getScreen("spiel");
+            ListBox listBox = screen.findNiftyControl("historie", ListBox.class);
+            listBox.clear();
+            for (D d : daten) {
+                listBox.addItem(d.getProperties().getProperty("zug"));
+            }
+        }
     }
 }
