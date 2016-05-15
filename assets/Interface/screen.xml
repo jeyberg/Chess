@@ -7,13 +7,8 @@
     <useControls filename="nifty-default-controls.xml" />
     <screen id="spiel" controller="mygame.Main" >
         <layer id="layer2" backgroundColor="#0000" childLayout="vertical" visibleToMouse="true" height="85%" width="25%">
-<<<<<<< HEAD
-            <panel id="historiePanel" height="85%" width="25%" align="right" backgroundColor="#fff1" childLayout="center">
-                <text id="historie" text="Historie: ${CALL.getHistorie()}" font="Interface/Fonts/Arial.fnt" height="100%" width="100%" wrap="true"/>
-=======
             <panel id="history" height="85%" width="25%" align="right" backgroundColor="#fff1" childLayout="vertical">
                 <control id="historie" name="listBox" vertical="optional" horizontal="off" displayItems="17" selectionMode="Disabled"></control>
->>>>>>> refs/remotes/origin/master
                 <control name="button" label="Weiterspielen" id="weiterspielen" align="center" valign="bottom">
                     <interact onClick=""/>
                 </control>
@@ -35,9 +30,16 @@
                 </control>
             </panel>
             <panel id="board" height="80%" width="75%" align="left" backgroundColor="#f8f1" childLayout="center">
-            </panel>            
-            <panel id="messages" height="15%" width="100%" align="center" backgroundColor="#ff81" childLayout="center">
-                <text name="texts" text="Daten: ${CALL.getDaten()}" font="Interface/Fonts/Arial.fnt" height="100%" width="100%" />
+            </panel>          
+            <panel id="informationen" height="15%" width="100%" align="center" backgroundColor="#ff81" childLayout="center">
+                <panel id="zugeingabe" backgroundColor="#ff81" width="25%" height="100%" align="right" valign="bottom" childLayout="vertical">
+                    <text text="Zug eingeben:" font="Interface/Fonts/Arial.fnt"/>
+                    <control id="von" label="von" name="textfield" width="50px"></control>
+                    <control id="nach" label="nach" name="textfield" width="50px"></control>
+                    <control name="button" label="Ziehen" id="ziehen" align="center" valign="center">
+                        <interact onClick="zugPerSchachnotation()"/>
+                    </control>
+                </panel>
             </panel>
         </layer>        
     </screen>

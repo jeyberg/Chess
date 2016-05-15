@@ -26,6 +26,7 @@ import com.jme3.scene.shape.Sphere;
 import daten.D_Spiel;
 import daten.D_ZugHistorie;
 import de.lessvoid.nifty.Nifty;
+import de.lessvoid.nifty.builder.PopupBuilder;
 import de.lessvoid.nifty.controls.ListBox;
 import de.lessvoid.nifty.controls.RadioButton;
 import de.lessvoid.nifty.controls.TextField;
@@ -241,6 +242,8 @@ public class Main extends SimpleApplication implements ScreenController {
             this.zmngr = new Zugmanager(isWeiss);
             initPos();
             initBoard();
+            initBrettRandZiffer(true);
+            initBrettRandZiffer(false);
             figuren();
             aktualisiereHistorie();
             nifty.gotoScreen("spiel");
@@ -249,39 +252,6 @@ public class Main extends SimpleApplication implements ScreenController {
         }
     }
     
-    
-    public List<String> getHistorie(){
-        //String xml = spielStub.getZugHistorie();
-        List<String> historie = new ArrayList<String>();
-        if(spielStub.getZugHistorie() != null){
-            ArrayList<D> zugHistorie = Xml.toArray(spielStub.getZugHistorie());
-            for(D d : zugHistorie){
-                String zug = d.getProperties().getProperty("zug");
-                if((zug != null) && (zug.length() > 0)){
-                    historie.add(zug);
-                }
-            }
-        }
-        return historie;
-    }
-    
-    public List<String> getDaten(){
-        String xml = spielStub.getSpielDaten();
-        List<String> daten = new ArrayList<String>();
-        ArrayList<D> data = Xml.toArray(xml);
-        for(D d : data){
-            String s = d.getProperties().getProperty("status");
-            daten.add(s);
-        }
-        return daten;
-    }
-<<<<<<< HEAD
-    
-
-    
-=======
-
->>>>>>> refs/remotes/origin/master
     public void loadGame() {
         String s = getXmlMessage(stub.ladenSpiel("somepath"));
         System.out.println(s);
@@ -322,20 +292,6 @@ public class Main extends SimpleApplication implements ScreenController {
     public void onEndScreen() {
         //To change body of generated methods, choose Tools | Templates.
     }
-<<<<<<< HEAD
-=======
-
-    public ArrayList<String> getHistorie() {
-        String xml = spielStub.getZugHistorie();
-        ArrayList<D> data = Xml.toArray(xml);
-        ArrayList<String> historie = new ArrayList<String>();
-        for (D d : data) {
-            String s = d.getProperties().getProperty("zug");
-            historie.add(s);
-        }
-        return historie;
-    }
->>>>>>> refs/remotes/origin/master
 
     void getLegalPositions(String pos) {
         String xml = spielStub.getErlaubteZuege(pos);
@@ -530,7 +486,6 @@ public class Main extends SimpleApplication implements ScreenController {
     }
 
     public void aktualisiereHistorie() {
-        int index;
         String xml = spielStub.getZugHistorie();
         if (xml != null) {
             ArrayList<D> daten = Xml.toArray(xml);
@@ -541,5 +496,41 @@ public class Main extends SimpleApplication implements ScreenController {
                 listBox.addItem(d.getProperties().getProperty("zug"));
             }
         }
+    }
+    
+    public void zugPerSchachnotation(){
+        String pos = null;
+        Screen scrn = nifty.getCurrentScreen();
+        String alleErlaubtenZuege = spielStub.getAlleErlaubtenZuege();
+        String erlaubteZuege = spielStub.getErlaubteZuege(pos);
+        ArrayList<D> data = Xml.toArray(alleErlaubtenZuege);
+        
+        String textVon = scrn.findNiftyControl("von", TextField.class).getRealText();
+        String textNach = scrn.findNiftyControl("nach", TextField.class).getRealText();
+        
+        if((!textVon.equals("")) && (!textNach.equals(""))){
+            for(D d : data){
+                if(d.getProperties().getProperty("von").equals(textVon) && d.getProperties().getProperty("nach").equals(textNach)){
+                    System.out.println("er vergleicht____________________________________________________________________");
+                }
+                else{
+                    System.out.println("falsche eingabe_______________________________________________________________________________");
+                }
+            }
+        }
+        
+        
+        /*String xml = spielStub.getAktuelleBelegung();
+        if(xml != null){
+            ArrayList<D> daten = Xml.toArray(xml);
+            Screen screen = nifty.getScreen("spiel");
+            ListBox listbox = screen.findNiftyControl("zugeingabe", ListBox.class);
+            listbox.clear();
+            for (D d : daten){
+                listbox.addItem("von: " + d.getProperties().getProperty("von") + " " + "nach: " + d.getProperties().getProperty("nach"));
+                //listbox.addItem(d.getProperties().getProperty("nach"));
+                return;
+            }
+        }*/
     }
 }

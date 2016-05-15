@@ -8,12 +8,10 @@ import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 
 import daten.D;
-<<<<<<< HEAD
+
 import daten.Xml;
-import daten.Xml;
-=======
-import mygame.Xml;
->>>>>>> refs/remotes/origin/master
+
+
 import restClient.iBackendSpielAdmin;
 
 public class BackendSpielAdminStub implements iBackendSpielAdmin{
