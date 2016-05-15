@@ -1,6 +1,5 @@
 package mygame;
 
-import daten.Xml;
 import daten.D;
 import restClient.BackendSpielAdminStub;
 import restClient.BackendSpielStub;
@@ -23,10 +22,7 @@ import com.jme3.scene.Node;
 import com.jme3.scene.shape.Box;
 import com.jme3.scene.shape.Dome;
 import com.jme3.scene.shape.Sphere;
-import daten.D_Spiel;
-import daten.D_ZugHistorie;
 import de.lessvoid.nifty.Nifty;
-import de.lessvoid.nifty.controls.ListBox;
 import de.lessvoid.nifty.controls.RadioButton;
 import de.lessvoid.nifty.controls.TextField;
 import de.lessvoid.nifty.screen.Screen;
@@ -35,7 +31,6 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
@@ -45,14 +40,13 @@ import org.jdom2.Element;
 import org.jdom2.JDOMException;
 import org.jdom2.input.SAXBuilder;
 
-
-public class Main extends SimpleApplication implements ScreenController {
+public class Main1 extends SimpleApplication implements ScreenController {
 
     private Node chessboard = new Node("chessboard");
     private Node figurenW = new Node("figurenW");
     private Node figurenS = new Node("figurenS");
-    private static BackendSpielAdminStub stub; // = new BackendSpielAdminStub("http://192.168.56.1:8000")
-    private static BackendSpielStub spielStub; // = new BackendSpielStub("http://192.168.56.1:8000");
+    private static BackendSpielAdminStub stub = null; // = new BackendSpielAdminStub("http://192.168.56.1:8000")
+    private static BackendSpielStub spielStub = null; // = new BackendSpielStub("http://192.168.56.1:8000");
     private Document doc;
     private SAXBuilder builder = new SAXBuilder();
     private Nifty nifty;
@@ -64,9 +58,8 @@ public class Main extends SimpleApplication implements ScreenController {
     private ArrayList<D> aktuelleBelegung;
     private int anzahlZeuge = 0;
 
-
     public static void main(String[] args) {
-        Main app = new Main();
+        Main1 app = new Main1();
         app.start();
     }
 
@@ -89,10 +82,10 @@ public class Main extends SimpleApplication implements ScreenController {
                 int zeuge = Integer.parseInt(s);
                 if (zeuge > anzahlZeuge) {
                     figuren();
-                    aktualisiereHistorie();
                     anzahlZeuge = zeuge;
                 }
             }
+
         }
     }
 
@@ -107,6 +100,7 @@ public class Main extends SimpleApplication implements ScreenController {
         inputManager.addListener(actionListener, "Klick");
         inputManager.addListener(actionListener, "Mouse_Mode");
     }
+    
     private ActionListener actionListener = new ActionListener() {
         public void onAction(String name, boolean isPressed, float tpf) {
             if (name.equals("Klick") && !isPressed && zmngr.getAmZug(spielStub)) {
@@ -120,11 +114,9 @@ public class Main extends SimpleApplication implements ScreenController {
                     if (g.getUserData("typ").equals("figur")) {
                         if (g.getUserData("farbe").equals("weiss") && zmngr.getIsWeiss()
                                 || g.getUserData("farbe").equals("schwarz") && !zmngr.getIsWeiss()) {
+                            gName = g.getName();
+                            gName = gName.substring(gName.length() - 2);
                             getLegalPositions(gName);
-                        } else {
-                            if (coloredTiles.containsKey(gName)) {
-                                draw(selectedTile, gName);
-                            }
                         }
                     } else if (g.getUserData("typ").equals("kachel")) {
                         if (g.getUserData("markiert")) {
@@ -147,7 +139,8 @@ public class Main extends SimpleApplication implements ScreenController {
         BitmapText ch = new BitmapText(guiFont, false);
         ch.setSize(guiFont.getCharSet().getRenderedSize() * 2);
         ch.setText("+");
-        ch.setLocalTranslation(settings.getWidth() / 2 - ch.getLineWidth() / 2, settings.getHeight() / 2 + ch.getLineHeight() / 2, 0); //settings.getWidth() / 2 - ch.getLineWidth() / 2, settings.getHeight() / 2 + ch.getLineHeight() / 2, 0
+        ch.setLocalTranslation(
+                settings.getWidth() / 2 - ch.getLineWidth() / 2, settings.getHeight() / 2 + ch.getLineHeight() / 2, 0);
         guiNode.attachChild(ch);
     }
 
@@ -214,20 +207,19 @@ public class Main extends SimpleApplication implements ScreenController {
         String text = scrn.findNiftyControl("ip", TextField.class).getRealText();
         boolean isWeiss = scrn.findNiftyControl("weiss", RadioButton.class).isActivated();
         if (!text.equals("")) {
-            stub = new BackendSpielAdminStub("http://" + text + ":8000");
-            spielStub = new BackendSpielStub("http://" + text + ":8000");
+            stub = new BackendSpielAdminStub("http://" + text);
+            spielStub = new BackendSpielStub("http://" + text);
             this.zmngr = new Zugmanager(isWeiss);
             String s = stub.neuesSpiel();
             ArrayList<D> daten = Xml.toArray(s);
             if (daten.get(0).getProperties().getProperty("klasse").equals("D_OK")) {
                 initPos();
                 initBoard();
-                initBrettRandZiffer(true);
-                initBrettRandZiffer(false);
                 figuren();
                 nifty.gotoScreen("spiel");
                 setKameraPosition(zmngr.getIsWeiss());
             }
+            System.out.println(daten);
         }
     }
 
@@ -236,52 +228,17 @@ public class Main extends SimpleApplication implements ScreenController {
         String text = scrn.findNiftyControl("ip", TextField.class).getRealText();
         boolean isWeiss = scrn.findNiftyControl("weiss", RadioButton.class).isActivated();
         if (!text.equals("")) {
-            stub = new BackendSpielAdminStub("http://" + text + ":8000");
-            spielStub = new BackendSpielStub("http://" + text + ":8000");
+            stub = new BackendSpielAdminStub("http://" + text);
+            spielStub = new BackendSpielStub("http://" + text);
             this.zmngr = new Zugmanager(isWeiss);
             initPos();
             initBoard();
             figuren();
-            aktualisiereHistorie();
             nifty.gotoScreen("spiel");
             setKameraPosition(zmngr.getIsWeiss());
-            
         }
     }
     
-    
-    public List<String> getHistorie(){
-        //String xml = spielStub.getZugHistorie();
-        List<String> historie = new ArrayList<String>();
-        if(spielStub.getZugHistorie() != null){
-            ArrayList<D> zugHistorie = Xml.toArray(spielStub.getZugHistorie());
-            for(D d : zugHistorie){
-                String zug = d.getProperties().getProperty("zug");
-                if((zug != null) && (zug.length() > 0)){
-                    historie.add(zug);
-                }
-            }
-        }
-        return historie;
-    }
-    
-    public List<String> getDaten(){
-        String xml = spielStub.getSpielDaten();
-        List<String> daten = new ArrayList<String>();
-        ArrayList<D> data = Xml.toArray(xml);
-        for(D d : data){
-            String s = d.getProperties().getProperty("status");
-            daten.add(s);
-        }
-        return daten;
-    }
-<<<<<<< HEAD
-    
-
-    
-=======
-
->>>>>>> refs/remotes/origin/master
     public void loadGame() {
         String s = getXmlMessage(stub.ladenSpiel("somepath"));
         System.out.println(s);
@@ -322,20 +279,18 @@ public class Main extends SimpleApplication implements ScreenController {
     public void onEndScreen() {
         //To change body of generated methods, choose Tools | Templates.
     }
-<<<<<<< HEAD
-=======
-
-    public ArrayList<String> getHistorie() {
+    
+        
+    public ArrayList<String> getHistorie(){
         String xml = spielStub.getZugHistorie();
         ArrayList<D> data = Xml.toArray(xml);
         ArrayList<String> historie = new ArrayList<String>();
-        for (D d : data) {
+        for(D d : data){
             String s = d.getProperties().getProperty("zug");
             historie.add(s);
         }
         return historie;
     }
->>>>>>> refs/remotes/origin/master
 
     void getLegalPositions(String pos) {
         String xml = spielStub.getErlaubteZuege(pos);
@@ -348,7 +303,6 @@ public class Main extends SimpleApplication implements ScreenController {
         selectedTile = pos;
         changeTileColor(positions);
     }
-    
 
     void changeTileColor(List<String> plist) {
         resetTileColor();
@@ -363,7 +317,9 @@ public class Main extends SimpleApplication implements ScreenController {
             sp.setUserData("markiert", true);
         }
     }
+    
 
+    
     void resetTileColor() {
         if (!coloredTiles.isEmpty()) {
             for (Map.Entry<String, Material> entry : coloredTiles.entrySet()) {
@@ -376,7 +332,7 @@ public class Main extends SimpleApplication implements ScreenController {
             coloredTiles.clear();
         }
     }
-
+    
     void draw(String from, String to) {
         String xml = spielStub.ziehe(from, to);
         ArrayList<D> data = Xml.toArray(xml);
@@ -384,7 +340,6 @@ public class Main extends SimpleApplication implements ScreenController {
             resetTileColor();
             figuren();
             zmngr.setAmZug(false);
-            //aktualisiereHistorie();
         } else {
             getLegalPositions(to);
         }
@@ -445,57 +400,6 @@ public class Main extends SimpleApplication implements ScreenController {
         System.out.println(positions);
     }
 
-    public void initBrettRandZiffer(Boolean macheZiffer) {
-        float x;
-        float z;
-        if (macheZiffer) {
-            x = -9f;
-            z = -8f;
-        } else {
-            z = -10.5f;
-            x = -7f;
-        }
-        char buchstabe = 'a';
-        int nummer = 8;
-        guiFont = assetManager.loadFont("Interface/Fonts/Default.fnt");
-        for (int i = 0; i < 2; i++) {
-            for (int j = 0; j < 8; j++) {
-                BitmapText ch = new BitmapText(guiFont, false);
-                ch.setSize(2f);
-                if (macheZiffer) {
-                    ch.setText(String.valueOf(nummer));
-                } else {
-                    ch.setText(String.valueOf(buchstabe));
-                }
-                if (i < 1) {
-                    ch.setLocalTranslation(x - 0.5f, 0, z);
-                } else {
-                    ch.setLocalTranslation(x - 0.5f, 0, z);
-                }
-                ch.rotate(-1.5708f, 0, 0);
-                rootNode.attachChild(ch);
-                if (macheZiffer) {
-                    z += 2;
-                    nummer--;
-                } else {
-                    x += 2;
-                    buchstabe++;
-                }
-            }
-            if (macheZiffer) {
-                nummer = 8;
-                x *= -1;
-                z = -8f;
-            } else {
-                buchstabe = 'a';
-                x = -7;
-                z = 8;
-            }
-
-        }
-
-    }
-
     Geometry getGeometry(String type, String pos) {
         Geometry g = null;
         if (type.equals("Turm")) {
@@ -527,19 +431,5 @@ public class Main extends SimpleApplication implements ScreenController {
             cam.setLocation(new Vector3f(0f, 10f, -25f));
         }
         cam.lookAt(new Vector3f(0f, 0f, 0f), Vector3f.UNIT_Y);
-    }
-
-    public void aktualisiereHistorie() {
-        int index;
-        String xml = spielStub.getZugHistorie();
-        if (xml != null) {
-            ArrayList<D> daten = Xml.toArray(xml);
-            Screen screen = nifty.getScreen("spiel");
-            ListBox listBox = screen.findNiftyControl("historie", ListBox.class);
-            listBox.clear();
-            for (D d : daten) {
-                listBox.addItem(d.getProperties().getProperty("zug"));
-            }
-        }
     }
 }

@@ -7,8 +7,13 @@
     <useControls filename="nifty-default-controls.xml" />
     <screen id="spiel" controller="mygame.Main" >
         <layer id="layer2" backgroundColor="#0000" childLayout="vertical" visibleToMouse="true" height="85%" width="25%">
+<<<<<<< HEAD
             <panel id="historiePanel" height="85%" width="25%" align="right" backgroundColor="#fff1" childLayout="center">
                 <text id="historie" text="Historie: ${CALL.getHistorie()}" font="Interface/Fonts/Arial.fnt" height="100%" width="100%" wrap="true"/>
+=======
+            <panel id="history" height="85%" width="25%" align="right" backgroundColor="#fff1" childLayout="vertical">
+                <control id="historie" name="listBox" vertical="optional" horizontal="off" displayItems="17" selectionMode="Disabled"></control>
+>>>>>>> refs/remotes/origin/master
                 <control name="button" label="Weiterspielen" id="weiterspielen" align="center" valign="bottom">
                     <interact onClick=""/>
                 </control>
