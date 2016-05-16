@@ -58,6 +58,8 @@ public class Main extends SimpleApplication implements ScreenController {
     private Zugmanager zmngr;
     private ArrayList<D> aktuelleBelegung;
     private int anzahlZeuge = 0;
+    private Node geschlagenW = new Node("geschlagenW");
+    private Node geschlagenS = new Node("geschlagenS");
 
     public static void main(String[] args) {
         Main app = new Main();
@@ -110,20 +112,19 @@ public class Main extends SimpleApplication implements ScreenController {
                 chessboard.collideWith(ray, results);
                 if (results.size() > 0) {
                     Geometry g = results.getClosestCollision().getGeometry();
-                    String gName = g.getName();
-                    gName = gName.substring(gName.length() - 2);
+                    String pos = g.getUserData("position");
                     if (g.getUserData("typ").equals("figur")) {
                         if (g.getUserData("farbe").equals("weiss") && zmngr.getIsWeiss()
                                 || g.getUserData("farbe").equals("schwarz") && !zmngr.getIsWeiss()) {
-                            getLegalPositions(gName);
+                            getLegalPositions(pos);
                         } else {
-                            if (coloredTiles.containsKey(gName)) {
-                                draw(selectedTile, gName);
+                            if (coloredTiles.containsKey(pos)) {
+                                draw(selectedTile, pos);
                             }
                         }
                     } else if (g.getUserData("typ").equals("kachel")) {
                         if (g.getUserData("markiert")) {
-                            draw(selectedTile, gName);
+                            draw(selectedTile, pos);
                         }
                     }
                 }
@@ -181,6 +182,7 @@ public class Main extends SimpleApplication implements ScreenController {
                 geom.setLocalTranslation(pos);
                 geom.setUserData("typ", "kachel");
                 geom.setUserData("markiert", false);
+                geom.setUserData("position", name);
                 x += 2;
                 letter++;
                 chessboard.attachChild(geom);
@@ -236,6 +238,8 @@ public class Main extends SimpleApplication implements ScreenController {
             this.zmngr = new Zugmanager(isWeiss);
             initPos();
             initBoard();
+            initBrettRandZiffer(true);
+            initBrettRandZiffer(false);
             figuren();
             aktualisiereHistorie();
             nifty.gotoScreen("spiel");
@@ -352,10 +356,12 @@ public class Main extends SimpleApplication implements ScreenController {
         ArrayList<D> data = Xml.toArray(xml);
         if (!data.isEmpty()) {
             chessboard.detachAllChildren();
+            geschlagenW.detachAllChildren();
+            geschlagenS.detachAllChildren();
             initBoard();
             for (D d : data) {
-                if (d.getProperties().getProperty("klasse").equals("D_Figur") && !d.getProperties().getProperty("position").equals("")) {
-                    Geometry g = getGeometry(d.getProperties().getProperty("typ"), d.getProperties().getProperty("position"));
+                if (d.getProperties().getProperty("klasse").equals("D_Figur")) {
+                    Geometry g = getGeometry(d.getProperties().getProperty("typ"));
                     if (d.getProperties().getProperty("isWeiss").equals("true")) {
                         Material white = new Material(assetManager,
                                 "Common/MatDefs/Misc/Unshaded.j3md");
@@ -369,8 +375,19 @@ public class Main extends SimpleApplication implements ScreenController {
                         g.setMaterial(black);
                         g.setUserData("farbe", "schwarz");
                     }
-                    g.setUserData("typ", "figur");
-                    chessboard.attachChild(g);
+                    if (!d.getProperties().getProperty("position").equals("")) {
+                        g.setUserData("position", d.getProperties().getProperty("position"));
+                        Vector3f position = positions.get(g.getUserData("position"));
+                        float offset = g.getUserData("yOffset");
+                        position.setY(offset);
+                        g.setLocalTranslation(position);
+                        g.setUserData("typ", "figur");
+                        chessboard.attachChild(g);
+                    } else {
+                        zeigeGeschlageneFigur(g);
+                    }
+
+
 
                 }
             }
@@ -453,26 +470,26 @@ public class Main extends SimpleApplication implements ScreenController {
 
     }
 
-    Geometry getGeometry(String type, String pos) {
+    Geometry getGeometry(String type) {
         Geometry g = null;
         if (type.equals("Turm")) {
-            g = new Geometry("Turm" + pos, new Box(0.5f, 1.5f, 0.5f));
-            g.setLocalTranslation(positions.get(pos).setY(1.5f));
+            g = new Geometry("Turm", new Box(0.5f, 1.5f, 0.5f));
+            g.setUserData("yOffset", 1.5f);
         } else if (type.equals("Springer")) {
-            g = new Geometry("Springer" + pos, new Dome(Vector3f.ZERO, 2, 4, 1f, false));
-            g.setLocalTranslation(positions.get(pos));
+            g = new Geometry("Springer", new Dome(Vector3f.ZERO, 2, 4, 1f, false));
+            g.setUserData("yOffset", 0f);
         } else if (type.equals("Laeufer")) {
-            g = new Geometry("Laeufer" + pos, new Dome(Vector3f.ZERO, 2, 32, 1f, false));
-            g.setLocalTranslation(positions.get(pos));
+            g = new Geometry("Laeufer", new Dome(Vector3f.ZERO, 2, 32, 1f, false));
+            g.setUserData("yOffset", 0f);
         } else if (type.equals("Koenig")) {
-            g = new Geometry("Koenig" + pos, new Dome(Vector3f.ZERO, 32, 32, 0.6f, false));
-            g.setLocalTranslation(positions.get(pos));
+            g = new Geometry("Koenig", new Dome(Vector3f.ZERO, 32, 32, 0.6f, false));
+            g.setUserData("yOffset", 0f);
         } else if (type.equals("Dame")) {
-            g = new Geometry("Dame" + pos, new Sphere(32, 32, 0.5f));
-            g.setLocalTranslation(positions.get(pos).setY(0.5f));
+            g = new Geometry("Dame", new Sphere(32, 32, 0.5f));
+            g.setUserData("yOffset", 0.5f);
         } else if (type.equals("Bauer")) {
-            g = new Geometry("Bauer" + pos, new Box(0.5f, 0.5f, 0.5f));
-            g.setLocalTranslation(positions.get(pos).setY(0.5f));
+            g = new Geometry("Bauer", new Box(0.5f, 0.5f, 0.5f));
+            g.setUserData("yOffset", 0.5f);
         }
         return g;
     }
@@ -498,5 +515,38 @@ public class Main extends SimpleApplication implements ScreenController {
                 listBox.addItem(d.getProperties().getProperty("zug"));
             }
         }
+    }
+
+    private void zeigeGeschlageneFigur(Geometry g) {
+
+        String farbe = g.getUserData("farbe");
+        int count = 0;
+        float x = 0, z = 0, y = g.getUserData("yOffset");
+        if (farbe.equals("weiss")) {
+            geschlagenW.attachChild(g);
+            count = geschlagenW.getQuantity();
+            if (count > 8) {
+                z = -13f;
+                x = -25f + (2 * count);
+            } else {
+                z = -11f;
+                x = -9f + (2 * count);
+            }
+
+        } else if (farbe.equals("schwarz")) {
+            geschlagenS.attachChild(g);
+            count = geschlagenS.getQuantity();
+            if (count > 8) {
+                z = 13f;
+                x = -25f + (2 * count);
+            } else {
+                z = 11f;
+                x = -9f + (2 * count);
+            }
+        }
+        Vector3f position = new Vector3f(x, y, z);
+        g.setLocalTranslation(position);
+        rootNode.attachChild(geschlagenW);
+        rootNode.attachChild(geschlagenS);
     }
 }
