@@ -60,6 +60,7 @@ public class Main extends SimpleApplication implements ScreenController {
     private int anzahlZeuge = 0;
     private Node geschlagenW = new Node("geschlagenW");
     private Node geschlagenS = new Node("geschlagenS");
+    private String letzterStatus;
 
     public static void main(String[] args) {
         Main app = new Main();
@@ -81,14 +82,20 @@ public class Main extends SimpleApplication implements ScreenController {
             String xml = spielStub.getSpielDaten();
             ArrayList<D> daten = Xml.toArray(xml);
             String s = daten.get(0).getProperties().getProperty("anzahlZuege");
+            String status = daten.get(0).getProperties().getProperty("status");
             if (s != null) {
                 int zeuge = Integer.parseInt(s);
                 if (zeuge > anzahlZeuge) {
                     figuren();
                     aktualisiereHistorie();
                     anzahlZeuge = zeuge;
+                    if (!status.equals("") && !status.equals("null")) {
+                        aktualisiereNachrichten(status);
+                    }
                 }
+
             }
+
 
         }
     }
@@ -504,7 +511,6 @@ public class Main extends SimpleApplication implements ScreenController {
     }
 
     public void aktualisiereHistorie() {
-        int index;
         String xml = spielStub.getZugHistorie();
         if (xml != null) {
             ArrayList<D> daten = Xml.toArray(xml);
@@ -515,6 +521,31 @@ public class Main extends SimpleApplication implements ScreenController {
                 listBox.addItem(d.getProperties().getProperty("zug"));
             }
         }
+    }
+
+    public void aktualisiereNachrichten(String nachricht) {
+        if (nachricht.equals("SchwarzSchachMatt")) {
+            nachricht = "Schwarz im Schach Matt!";
+            if (zmngr.getIsWeiss()) {
+                nachricht += " Gewonnen!";
+            } else {
+                nachricht += " Verloren!";
+            }
+        } else if (nachricht.equals("SchwarzSchach")) {
+            nachricht = "Schwarz im Schach!";
+        } else if (nachricht.equals("WeissSchachMatt")) {
+            nachricht = "Weiss im Schach Matt!";
+            if (zmngr.getIsWeiss()) {
+                nachricht += " Verloren!";
+            } else {
+                nachricht += " Gewonnen!";
+            }
+        } else if (nachricht.equals("WeissSchach")) {
+            nachricht = "Weiss im Schach!";
+        }
+        Screen screen = nifty.getScreen("spiel");
+        ListBox listBox = screen.findNiftyControl("nachrichten", ListBox.class);
+        listBox.addItem(nachricht);
     }
 
     private void zeigeGeschlageneFigur(Geometry g) {
