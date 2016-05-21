@@ -13,7 +13,7 @@ import restClient.iBackendSpiel;
 
 public class BackendSpielStub implements iBackendSpiel{
 	private static final String urlUnterPfad="schach/spiel/";
-	private static final boolean log=true;
+	private static final boolean log=false;
 	private String url;
 	private Client client=ClientBuilder.newClient();
 	

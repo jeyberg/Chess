@@ -36,6 +36,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
@@ -255,32 +257,17 @@ public class Main extends SimpleApplication implements ScreenController {
     }
 
     public void loadGame() {
-        String s = getXmlMessage(stub.ladenSpiel("somepath"));
+        String s = stub.ladenSpiel("somepath");
         System.out.println(s);
     }
 
     public void saveGame() {
-        String s = getXmlMessage(stub.speichernSpiel("somepath"));
+        String s = stub.speichernSpiel("somepath");
         System.out.println(s);
     }
 
     public void quitGame() {
         this.stop();
-    }
-
-    public String getXmlMessage(String msg) {
-        String s = null;
-        try {
-            doc = builder.build(new StringReader(msg));
-            Element root = doc.getRootElement();
-            List<Element> entry = root.getChildren("entry");
-            s = entry.get(0).getText();
-        } catch (JDOMException ex) {
-            Logger.getLogger(MyStartScreen.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IOException ex) {
-            Logger.getLogger(MyStartScreen.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        return s;
     }
 
     public void bind(Nifty nifty, Screen screen) {
@@ -345,7 +332,26 @@ public class Main extends SimpleApplication implements ScreenController {
         }
     }
 
+    public void zieheVonGui() {
+        String s = "";
+        String pattern = "[a-hA-H]{1}[1-8]{1}";
+        Pattern r = Pattern.compile(pattern);
+
+        Screen scrn = nifty.getCurrentScreen();
+        String von = scrn.findNiftyControl("von", TextField.class).getRealText();
+        String nach = scrn.findNiftyControl("nach", TextField.class).getRealText();
+        Matcher m = r.matcher(von);
+        Matcher m2 = r.matcher(nach);
+        if (m.find() && m2.find()) {
+            scrn.findNiftyControl("von", TextField.class).setText(s.subSequence(0, 0));
+            scrn.findNiftyControl("nach", TextField.class).setText(s.subSequence(0, 0));
+            if(zmngr.getAmZug(spielStub)) draw(von, nach);
+        }
+
+    }
+
     void draw(String from, String to) {
+        System.out.println("ziehe");
         String xml = spielStub.ziehe(from, to);
         ArrayList<D> data = Xml.toArray(xml);
         if (data.get(0).getProperties().getProperty("klasse").equals("D_OK")) {

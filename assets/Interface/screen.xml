@@ -29,10 +29,19 @@
                     <interact onClick="quitGame()"/> 
                 </control>
             </panel>
-            <panel id="board" height="80%" width="75%" align="left" backgroundColor="#f8f1" childLayout="center">
-            </panel>            
-            <panel id="messages" height="15%" width="100%" align="center" backgroundColor="#ff81" childLayout="center">
-                <control id="nachrichten" name="listBox" vertical="optional" horizontal="off" displayItems="5" selectionMode="Disabled"></control>
+            <panel id="board" height="80%" width="75%" align="left" backgroundColor="#f8f1" childLayout="center"></panel>            
+            <panel id="messages" height="15%" width="100%" align="center" backgroundColor="#ff81" childLayout="vertical">
+                
+                <panel id="zugEingabe" height="35%" width="100%" align="center" childLayout="horizontal">
+                    <control name="label" text="Von:"></control>
+                    <control name="textfield" id="von" maxLength="2" width="20px"></control>
+                    <control name="label" text="Nach:"></control>
+                    <control name="textfield" id="nach" maxLength="2" width="20px"></control>
+                    <control name="button" label="Los" id="zieheButton">
+                        <interact onClick="zieheVonGui()"/>
+                    </control>
+                </panel>                
+                <control id="nachrichten" name="listBox" vertical="optional" horizontal="off" displayItems="5" selectionMode="Disabled"></control>                
             </panel>
         </layer>        
     </screen>
