@@ -42,6 +42,7 @@ import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
 import org.jdom2.input.SAXBuilder;
+import org.lwjgl.opengl.Display;
 
 public class Main extends SimpleApplication implements ScreenController {
 
@@ -72,6 +73,7 @@ public class Main extends SimpleApplication implements ScreenController {
 
     @Override
     public void simpleInitApp() {
+        Display.setResizable(true);
         flyCam.setDragToRotate(true);
         flyCam.setMoveSpeed(15f);
         initGui();
@@ -81,6 +83,11 @@ public class Main extends SimpleApplication implements ScreenController {
 
     @Override
     public void simpleUpdate(float tpf) {
+        if (Display.wasResized()) {
+            int newWidth = Math.max(Display.getWidth(), 1);
+            int newHeight = Math.max(Display.getHeight(), 1);
+            reshape(newWidth, newHeight);
+        }
         if (spielStub != null) {
             String xml = spielStub.getSpielDaten();
             ArrayList<D> daten = Xml.toArray(xml);
@@ -527,7 +534,7 @@ public class Main extends SimpleApplication implements ScreenController {
             listBox.clear();
             for (D d : daten) {
                 listBox.addItem(d.getProperties().getProperty("zug"));
-            }
+            }      
         }
     }
 
@@ -539,6 +546,7 @@ public class Main extends SimpleApplication implements ScreenController {
             } else {
                 nachricht += " Verloren!";
             }
+            
         } else if (nachricht.equals("SchwarzSchach")) {
             nachricht = "Schwarz im Schach!";
         } else if (nachricht.equals("WeissSchachMatt")) {
