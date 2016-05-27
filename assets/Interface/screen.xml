@@ -15,7 +15,7 @@
         <layer id="layer1" backgroundColor="#0000" childLayout="vertical" visibleToMouse="true">
             <panel id="menue" height="5%" width="100%" align="left" childLayout="horizontal" backgroundColor="#0000">
                 <control name="button" label="Neues Spiel" id="start" align="center" valign="center">
-                    <interact onClick="newGame()"/> 
+                    <interact onClick="revanche()"/> 
                 </control>
                 <control name="button" label="Spiel laden" id="load" align="center" valign="center">
                     <interact onClick="loadGame()"/> 
