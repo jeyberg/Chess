@@ -32,6 +32,8 @@ import de.lessvoid.nifty.screen.ScreenController;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -379,6 +381,7 @@ public class Main extends SimpleApplication implements ScreenController {
     void figuren() {
         String xml = spielStub.getAktuelleBelegung();
         ArrayList<D> data = Xml.toArray(xml);
+        ArrayList<Geometry> geschlageneFiguren = new ArrayList<Geometry>();
         if (!data.isEmpty()) {
             chessboard.detachAllChildren();
             geschlagenW.detachAllChildren();
@@ -409,12 +412,16 @@ public class Main extends SimpleApplication implements ScreenController {
                         g.setUserData("typ", "figur");
                         chessboard.attachChild(g);
                     } else {
-                        zeigeGeschlageneFigur(g);
+                        geschlageneFiguren.add(g);
+
                     }
 
 
 
                 }
+            }
+            if (geschlageneFiguren.size() != 0) {
+                zeigeGeschlageneFigur(geschlageneFiguren);
             }
             rootNode.attachChild(figurenW);
             rootNode.attachChild(figurenS);
@@ -457,20 +464,15 @@ public class Main extends SimpleApplication implements ScreenController {
                 BitmapText ch = new BitmapText(guiFont, false);
                 ch.setSize(2f);
                 ch.setText(String.valueOf(nummer));
-//                if (i < 1) {
-//                    ch.setLocalTranslation(x - 0.5f, 0, z);
-//                } else {
-                
-//                }
-                if(i < 1){
+                if (i < 1) {
                     ch.setLocalTranslation(x - 0.5f, 0, z);
                     ch.rotate(-1.5708f, 0, 0);
-                }else{
-                    
-                    ch.setLocalTranslation(x + 0.5f, 0, z+2.5f);
+                } else {
+
+                    ch.setLocalTranslation(x + 0.5f, 0, z + 2.5f);
                     ch.rotate(-1.5708f, 3.14159f, 0);
                 }
-                
+
                 rootNode.attachChild(ch);
                 z += 2;
                 nummer--;
@@ -519,21 +521,27 @@ public class Main extends SimpleApplication implements ScreenController {
         if (type.equals("Turm")) {
             g = new Geometry("Turm", new Box(0.5f, 1.5f, 0.5f));
             g.setUserData("yOffset", 1.5f);
+            g.setUserData("rang", "d");
         } else if (type.equals("Springer")) {
             g = new Geometry("Springer", new Dome(Vector3f.ZERO, 2, 4, 1f, false));
             g.setUserData("yOffset", 0f);
+            g.setUserData("rang", "b");
         } else if (type.equals("Laeufer")) {
             g = new Geometry("Laeufer", new Dome(Vector3f.ZERO, 2, 32, 1f, false));
             g.setUserData("yOffset", 0f);
+            g.setUserData("rang", "c");
         } else if (type.equals("Koenig")) {
             g = new Geometry("Koenig", new Dome(Vector3f.ZERO, 32, 32, 0.6f, false));
             g.setUserData("yOffset", 0f);
+            g.setUserData("rang", "f");
         } else if (type.equals("Dame")) {
             g = new Geometry("Dame", new Sphere(32, 32, 0.5f));
             g.setUserData("yOffset", 0.5f);
+            g.setUserData("rang", "e");
         } else if (type.equals("Bauer")) {
             g = new Geometry("Bauer", new Box(0.5f, 0.5f, 0.5f));
             g.setUserData("yOffset", 0.5f);
+            g.setUserData("rang", "a");
         }
         return g;
     }
@@ -586,35 +594,43 @@ public class Main extends SimpleApplication implements ScreenController {
         listBox.addItem(nachricht);
     }
 
-    private void zeigeGeschlageneFigur(Geometry g) {
-
-        String farbe = g.getUserData("farbe");
-        int count = 0;
-        float x = 0, z = 0, y = g.getUserData("yOffset");
-        if (farbe.equals("weiss")) {
-            geschlagenW.attachChild(g);
-            count = geschlagenW.getQuantity();
-            if (count > 8) {
-                z = -13f;
-                x = -25f + (2 * count);
-            } else {
-                z = -11f;
-                x = -9f + (2 * count);
+    private void zeigeGeschlageneFigur(ArrayList<Geometry> geschlageneFiguren) {
+        Collections.sort(geschlageneFiguren, new Comparator<Geometry>() {
+            public int compare(Geometry o1, Geometry o2) {
+                String s = (String) o1.getUserData("rang");
+                String s2 = (String) o2.getUserData("rang");
+                return s.compareTo(s2);
             }
+        });
+        for (Geometry g : geschlageneFiguren) {
+            String farbe = g.getUserData("farbe");
+            int count = 0;
+            float x = 0, z = 0, y = g.getUserData("yOffset");
+            if (farbe.equals("weiss")) {
+                geschlagenW.attachChild(g);
+                count = geschlagenW.getQuantity();
+                if (count > 8) {
+                    z = -13f;
+                    x = -25f + (2 * count);
+                } else {
+                    z = -11f;
+                    x = -9f + (2 * count);
+                }
 
-        } else if (farbe.equals("schwarz")) {
-            geschlagenS.attachChild(g);
-            count = geschlagenS.getQuantity();
-            if (count > 8) {
-                z = 13f;
-                x = -25f + (2 * count);
-            } else {
-                z = 11f;
-                x = -9f + (2 * count);
+            } else if (farbe.equals("schwarz")) {
+                geschlagenS.attachChild(g);
+                count = geschlagenS.getQuantity();
+                if (count > 8) {
+                    z = 13f;
+                    x = 25f - (2 * count);
+                } else {
+                    z = 11f;
+                    x = 9f - (2 * count);
+                }
             }
+            Vector3f position = new Vector3f(x, y, z);
+            g.setLocalTranslation(position);
         }
-        Vector3f position = new Vector3f(x, y, z);
-        g.setLocalTranslation(position);
         rootNode.attachChild(geschlagenW);
         rootNode.attachChild(geschlagenS);
     }
