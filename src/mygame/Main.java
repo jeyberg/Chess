@@ -63,6 +63,7 @@ public class Main extends SimpleApplication implements ScreenController {
     private Node geschlagenW = new Node("geschlagenW");
     private Node geschlagenS = new Node("geschlagenS");
     private String letzterStatus;
+    private boolean istHost = false;
 
     public static void main(String[] args) {
         Main app = new Main();
@@ -233,6 +234,7 @@ public class Main extends SimpleApplication implements ScreenController {
                 figuren();
                 nifty.gotoScreen("spiel");
                 setKameraPosition(zmngr.getIsWeiss());
+                istHost = true;
             }
         }
     }
@@ -585,5 +587,14 @@ public class Main extends SimpleApplication implements ScreenController {
         g.setLocalTranslation(position);
         rootNode.attachChild(geschlagenW);
         rootNode.attachChild(geschlagenS);
+    }
+    
+    public void revanche(){
+        System.out.println("test");
+        if(istHost){
+            spielErstellen();
+        }else{
+            spielBeitreten();
+        }
     }
 }

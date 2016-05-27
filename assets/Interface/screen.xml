@@ -9,9 +9,7 @@
         <layer id="layer2" backgroundColor="#0000" childLayout="vertical" visibleToMouse="true" height="85%" width="25%">
             <panel id="history" height="85%" width="25%" align="right" backgroundColor="#fff1" childLayout="vertical">
                 <control id="historie" name="listBox" vertical="optional" horizontal="off" displayItems="15" selectionMode="Disabled"></control>
-                <control name="button" label="Weiterspielen" id="weiterspielen" align="center" valign="bottom">
-                    <interact onClick=""/>
-                </control>
+                
             </panel>
         </layer>
         <layer id="layer1" backgroundColor="#0000" childLayout="vertical" visibleToMouse="true">
