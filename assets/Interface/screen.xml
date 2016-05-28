@@ -42,7 +42,9 @@
                     <control id="historieW" name="listBox" vertical="optional" horizontal="off" displayItems="15" selectionMode="Single"></control>
                     <control id="historieS" name="listBox" vertical="optional" horizontal="off" displayItems="15" selectionMode="Single"></control>
                 </panel>
-                
+                <control id="weiterspielenButton" name="button" label="Weiterspielen">
+                    <interact onClick="weiterspielen()"/>
+                </control>
             </panel>
         </layer>        
     </screen>
