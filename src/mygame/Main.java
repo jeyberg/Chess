@@ -13,7 +13,6 @@ import com.jme3.input.controls.KeyTrigger;
 import com.jme3.input.controls.MouseButtonTrigger;
 import com.jme3.material.Material;
 import com.jme3.math.ColorRGBA;
-import com.jme3.math.Quaternion;
 import com.jme3.math.Ray;
 import com.jme3.math.Vector3f;
 import com.jme3.niftygui.NiftyJmeDisplay;
@@ -24,27 +23,21 @@ import com.jme3.scene.shape.Box;
 import com.jme3.scene.shape.Dome;
 import com.jme3.scene.shape.Sphere;
 import de.lessvoid.nifty.Nifty;
+import de.lessvoid.nifty.NiftyEventSubscriber;
 import de.lessvoid.nifty.controls.ListBox;
+import de.lessvoid.nifty.controls.ListBoxSelectionChangedEvent;
 import de.lessvoid.nifty.controls.RadioButton;
 import de.lessvoid.nifty.controls.TextField;
 import de.lessvoid.nifty.screen.Screen;
 import de.lessvoid.nifty.screen.ScreenController;
-import java.io.IOException;
-import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.jdom2.Document;
-import org.jdom2.Element;
-import org.jdom2.JDOMException;
-import org.jdom2.input.SAXBuilder;
 import org.lwjgl.opengl.Display;
 
 public class Main extends SimpleApplication implements ScreenController {
@@ -54,20 +47,17 @@ public class Main extends SimpleApplication implements ScreenController {
     private Node figurenS = new Node("figurenS");
     private static BackendSpielAdminStub stub = null; // = new BackendSpielAdminStub("http://192.168.56.1:8000")
     private static BackendSpielStub spielStub = null; // = new BackendSpielStub("http://192.168.56.1:8000");
-    private Document doc;
-    private SAXBuilder builder = new SAXBuilder();
     private Nifty nifty;
     private boolean isFlying = false;
     private Map<String, Vector3f> positions = new HashMap<String, Vector3f>();
     private Map<String, Material> coloredTiles = new HashMap<String, Material>();
     private String selectedTile;
     private Zugmanager zmngr;
-    private ArrayList<D> aktuelleBelegung;
     private int anzahlZeuge = 0;
     private Node geschlagenW = new Node("geschlagenW");
     private Node geschlagenS = new Node("geschlagenS");
-    private String letzterStatus;
     private boolean istHost = false;
+    private boolean istPausiert = false;
 
     public static void main(String[] args) {
         Main app = new Main();
@@ -92,23 +82,24 @@ public class Main extends SimpleApplication implements ScreenController {
             reshape(neueBreite, neueHöhe);
         }
         if (spielStub != null) {
-            String xml = spielStub.getSpielDaten();
-            ArrayList<D> daten = Xml.toArray(xml);
-            String s = daten.get(0).getProperties().getProperty("anzahlZuege");
-            String status = daten.get(0).getProperties().getProperty("status");
-            if (s != null) {
-                int zeuge = Integer.parseInt(s);
-                if (zeuge > anzahlZeuge) {
-                    figuren();
-                    aktualisiereHistorie();
-                    anzahlZeuge = zeuge;
-                    if (!status.equals("") && !status.equals("null")) {
-                        aktualisiereNachrichten(status);
+            if (!istPausiert) {
+                String xml = spielStub.getSpielDaten();
+                ArrayList<D> daten = Xml.toArray(xml);
+                String s = daten.get(0).getProperties().getProperty("anzahlZuege");
+                String status = daten.get(0).getProperties().getProperty("status");
+                if (s != null) {
+                    int zeuge = Integer.parseInt(s);
+                    if (zeuge > anzahlZeuge) {
+                        figuren(spielStub.getAktuelleBelegung());
+                        aktualisiereHistorie();
+                        anzahlZeuge = zeuge;
+                        if (!status.equals("") && !status.equals("null")) {
+                            aktualisiereNachrichten(status);
+                        }
                     }
+
                 }
-
             }
-
 
         }
     }
@@ -126,7 +117,7 @@ public class Main extends SimpleApplication implements ScreenController {
     }
     private ActionListener actionListener = new ActionListener() {
         public void onAction(String name, boolean isPressed, float tpf) {
-            if (name.equals("Klick") && !isPressed && zmngr.getAmZug(spielStub)) {
+            if (name.equals("Klick") && !isPressed && !istPausiert && zmngr.getAmZug(spielStub)) {
                 CollisionResults results = new CollisionResults();
                 Ray ray = new Ray(cam.getLocation(), cam.getDirection());
                 chessboard.collideWith(ray, results);
@@ -241,7 +232,7 @@ public class Main extends SimpleApplication implements ScreenController {
                 initBoard();
                 initRandZiffer();
                 initRandBuchstabe();
-                figuren();
+                figuren(spielStub.getAktuelleBelegung());
                 nifty.gotoScreen("spiel");
                 setKameraPosition(zmngr.getIsWeiss());
                 istHost = true;
@@ -261,7 +252,7 @@ public class Main extends SimpleApplication implements ScreenController {
             initBoard();
             initRandZiffer();
             initRandBuchstabe();
-            figuren();
+            figuren(spielStub.getAktuelleBelegung());
             aktualisiereHistorie();
             nifty.gotoScreen("spiel");
             setKameraPosition(zmngr.getIsWeiss());
@@ -370,7 +361,7 @@ public class Main extends SimpleApplication implements ScreenController {
         ArrayList<D> data = Xml.toArray(xml);
         if (data.get(0).getProperties().getProperty("klasse").equals("D_OK")) {
             resetTileColor();
-            figuren();
+            figuren(spielStub.getAktuelleBelegung());
             zmngr.setAmZug(false);
             //aktualisiereHistorie();
         } else {
@@ -378,8 +369,8 @@ public class Main extends SimpleApplication implements ScreenController {
         }
     }
 
-    void figuren() {
-        String xml = spielStub.getAktuelleBelegung();
+    void figuren(String xml) {
+        
         ArrayList<D> data = Xml.toArray(xml);
         ArrayList<Geometry> geschlageneFiguren = new ArrayList<Geometry>();
         if (!data.isEmpty()) {
@@ -564,10 +555,10 @@ public class Main extends SimpleApplication implements ScreenController {
             ListBox listBoxSchwarz = screen.findNiftyControl("historieS", ListBox.class);
             listBoxWeiss.clear();
             listBoxSchwarz.clear(); // listBox.addItem(d.getProperties().getProperty("zug"));
-            for(int i = 0; i < daten.size(); i++){
-                if(i % 2 == 0){
+            for (int i = 0; i < daten.size(); i++) {
+                if (i % 2 == 0) {
                     listBoxWeiss.addItem(daten.get(i).getProperties().getProperty("zug"));
-                }else{
+                } else {
                     listBoxSchwarz.addItem(daten.get(i).getProperties().getProperty("zug"));
                 }
             }
@@ -648,5 +639,39 @@ public class Main extends SimpleApplication implements ScreenController {
         } else {
             spielBeitreten();
         }
+    }
+
+    @NiftyEventSubscriber(pattern = "historieW")
+    public void listBoxWausgewaehlt(final String id, final ListBoxSelectionChangedEvent<String> event) {
+        List<Integer> auswahl = event.getSelectionIndices();
+        if(auswahl.size() > 0){
+            istPausiert = true;
+            int index = auswahl.get(0);
+            index+=index+1;
+            figuren(spielStub.getBelegung(index));
+            Screen screen = nifty.getScreen("spiel");
+            ListBox listBox = screen.findNiftyControl("historieW", ListBox.class);
+            listBox.deselectItemByIndex(auswahl.get(0));
+        }
+    }
+    
+    @NiftyEventSubscriber(pattern = "historieS")
+    public void listBoxSausgewaehlt(final String id, final ListBoxSelectionChangedEvent<String> event) {
+        List<Integer> auswahl = event.getSelectionIndices();
+        if(auswahl.size() > 0){
+            istPausiert = true;
+            int index = auswahl.get(0);
+            index+=index+2;
+            figuren(spielStub.getBelegung(index));
+            Screen screen = nifty.getScreen("spiel");
+            ListBox listBox = screen.findNiftyControl("historieS", ListBox.class);
+            listBox.deselectItemByIndex(auswahl.get(0));
+        }
+    }
+    
+    public void weiterspielen(){
+        System.out.println("test");
+        istPausiert = false;
+        figuren(spielStub.getAktuelleBelegung());
     }
 }
