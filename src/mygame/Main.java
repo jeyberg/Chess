@@ -89,7 +89,7 @@ public class Main extends SimpleApplication implements ScreenController {
                 String status = daten.get(0).getProperties().getProperty("status");
                 if (s != null) {
                     int zeuge = Integer.parseInt(s);
-                    if (zeuge > anzahlZeuge) {
+                    if (zeuge > anzahlZeuge || zeuge < anzahlZeuge) {
                         figuren(spielStub.getAktuelleBelegung());
                         aktualisiereHistorie();
                         anzahlZeuge = zeuge;
@@ -258,15 +258,19 @@ public class Main extends SimpleApplication implements ScreenController {
             setKameraPosition(zmngr.getIsWeiss());
         }
     }
+    
+    public void neuesSpiel(){
+        System.out.println("starte neues Spiel");
+        stub.neuesSpiel();
+        figuren(spielStub.getAktuelleBelegung());
+    }
 
     public void loadGame() {
-        String s = stub.ladenSpiel("somepath");
-        System.out.println(s);
+        System.out.println("neues Spiel");
     }
 
     public void saveGame() {
-        String s = stub.speichernSpiel("somepath");
-        System.out.println(s);
+        System.out.println("neues Spiel");
     }
 
     public void quitGame() {
@@ -406,12 +410,9 @@ public class Main extends SimpleApplication implements ScreenController {
                         geschlageneFiguren.add(g);
 
                     }
-
-
-
                 }
             }
-            if (geschlageneFiguren.size() != 0) {
+            if (!geschlageneFiguren.isEmpty()) {
                 zeigeGeschlageneFigur(geschlageneFiguren);
             }
             rootNode.attachChild(figurenW);
@@ -630,15 +631,6 @@ public class Main extends SimpleApplication implements ScreenController {
         }
         rootNode.attachChild(geschlagenW);
         rootNode.attachChild(geschlagenS);
-    }
-
-    public void revanche() {
-        System.out.println("test");
-        if (istHost) {
-            spielErstellen();
-        } else {
-            spielBeitreten();
-        }
     }
 
     @NiftyEventSubscriber(pattern = "historieW")
