@@ -560,10 +560,16 @@ public class Main extends SimpleApplication implements ScreenController {
         if (xml != null) {
             ArrayList<D> daten = Xml.toArray(xml);
             Screen screen = nifty.getScreen("spiel");
-            ListBox listBox = screen.findNiftyControl("historie", ListBox.class);
-            listBox.clear();
-            for (D d : daten) {
-                listBox.addItem(d.getProperties().getProperty("zug"));
+            ListBox listBoxWeiss = screen.findNiftyControl("historieW", ListBox.class);
+            ListBox listBoxSchwarz = screen.findNiftyControl("historieS", ListBox.class);
+            listBoxWeiss.clear();
+            listBoxSchwarz.clear(); // listBox.addItem(d.getProperties().getProperty("zug"));
+            for(int i = 0; i < daten.size(); i++){
+                if(i % 2 == 0){
+                    listBoxWeiss.addItem(daten.get(i).getProperties().getProperty("zug"));
+                }else{
+                    listBoxSchwarz.addItem(daten.get(i).getProperties().getProperty("zug"));
+                }
             }
         }
     }
