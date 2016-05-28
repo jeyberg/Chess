@@ -5,23 +5,16 @@ import restClient.BackendSpielAdminStub;
 import restClient.BackendSpielStub;
 import com.jme3.app.SimpleApplication;
 import com.jme3.collision.CollisionResults;
-import com.jme3.font.BitmapText;
 import com.jme3.input.KeyInput;
 import com.jme3.input.MouseInput;
 import com.jme3.input.controls.ActionListener;
 import com.jme3.input.controls.KeyTrigger;
 import com.jme3.input.controls.MouseButtonTrigger;
-import com.jme3.material.Material;
-import com.jme3.math.ColorRGBA;
 import com.jme3.math.Ray;
 import com.jme3.math.Vector3f;
 import com.jme3.niftygui.NiftyJmeDisplay;
 import com.jme3.renderer.RenderManager;
 import com.jme3.scene.Geometry;
-import com.jme3.scene.Node;
-import com.jme3.scene.shape.Box;
-import com.jme3.scene.shape.Dome;
-import com.jme3.scene.shape.Sphere;
 import de.lessvoid.nifty.Nifty;
 import de.lessvoid.nifty.NiftyEventSubscriber;
 import de.lessvoid.nifty.controls.ListBox;
@@ -31,32 +24,20 @@ import de.lessvoid.nifty.controls.TextField;
 import de.lessvoid.nifty.screen.Screen;
 import de.lessvoid.nifty.screen.ScreenController;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.lwjgl.opengl.Display;
 
 public class Main extends SimpleApplication implements ScreenController {
 
-    private Node chessboard = new Node("chessboard");
-    private Node figurenW = new Node("figurenW");
-    private Node figurenS = new Node("figurenS");
-    private static BackendSpielAdminStub stub = null; // = new BackendSpielAdminStub("http://192.168.56.1:8000")
+    private GeometrieKonstruktor gKonstruktor = new GeometrieKonstruktor();
+    private static BackendSpielAdminStub adminStub = null; // = new BackendSpielAdminStub("http://192.168.56.1:8000")
     private static BackendSpielStub spielStub = null; // = new BackendSpielStub("http://192.168.56.1:8000");
     private Nifty nifty;
-    private boolean isFlying = false;
-    private Map<String, Vector3f> positions = new HashMap<String, Vector3f>();
-    private Map<String, Material> coloredTiles = new HashMap<String, Material>();
-    private String selectedTile;
+    private boolean istFliegend = false;
     private Zugmanager zmngr;
     private int anzahlZeuge = 0;
-    private Node geschlagenW = new Node("geschlagenW");
-    private Node geschlagenS = new Node("geschlagenS");
-    private boolean istHost = false;
     private boolean istPausiert = false;
 
     public static void main(String[] args) {
@@ -70,8 +51,8 @@ public class Main extends SimpleApplication implements ScreenController {
         flyCam.setDragToRotate(true);
         flyCam.setMoveSpeed(15f);
         initGui();
-        initCrossHairs();
-        initKey();
+        guiNode.attachChild(gKonstruktor.initFadenkreuz(guiFont, this, assetManager, settings));
+        initBelegung();
     }
 
     @Override
@@ -90,7 +71,7 @@ public class Main extends SimpleApplication implements ScreenController {
                 if (s != null) {
                     int zeuge = Integer.parseInt(s);
                     if (zeuge > anzahlZeuge || zeuge < anzahlZeuge) {
-                        figuren(spielStub.getAktuelleBelegung());
+                        gKonstruktor.figuren(spielStub.getAktuelleBelegung(), assetManager, rootNode);
                         aktualisiereHistorie();
                         anzahlZeuge = zeuge;
                         if (!status.equals("") && !status.equals("null")) {
@@ -109,7 +90,7 @@ public class Main extends SimpleApplication implements ScreenController {
         //TODO: add render code
     }
 
-    private void initKey() {
+    private void initBelegung() {
         inputManager.addMapping("Klick", new MouseButtonTrigger(MouseInput.BUTTON_LEFT));
         inputManager.addMapping("Mouse_Mode", new KeyTrigger(KeyInput.KEY_LMENU));
         inputManager.addListener(actionListener, "Klick");
@@ -120,93 +101,33 @@ public class Main extends SimpleApplication implements ScreenController {
             if (name.equals("Klick") && !isPressed && !istPausiert && zmngr.getAmZug(spielStub)) {
                 CollisionResults results = new CollisionResults();
                 Ray ray = new Ray(cam.getLocation(), cam.getDirection());
-                chessboard.collideWith(ray, results);
+                gKonstruktor.schachbrett.collideWith(ray, results);
                 if (results.size() > 0) {
                     Geometry g = results.getClosestCollision().getGeometry();
                     String pos = g.getUserData("position");
                     if (g.getUserData("typ").equals("figur")) {
                         if (g.getUserData("farbe").equals("weiss") && zmngr.getIsWeiss()
                                 || g.getUserData("farbe").equals("schwarz") && !zmngr.getIsWeiss()) {
-                            getLegalPositions(pos);
+                            getErlaubteZeuge(pos);
                         } else {
-                            if (coloredTiles.containsKey(pos)) {
-                                draw(selectedTile, pos);
+                            if (gKonstruktor.markierteKacheln.containsKey(pos)) {
+                                ziehe(gKonstruktor.gewaehleteKachel, pos);
                             }
                         }
                     } else if (g.getUserData("typ").equals("kachel")) {
                         if (g.getUserData("markiert")) {
-                            draw(selectedTile, pos);
+                            ziehe(gKonstruktor.gewaehleteKachel, pos);
                         }
                     }
                 }
             } else if (name.equals("Mouse_Mode") && !isPressed) {
-                flyCam.setDragToRotate(isFlying);
-                isFlying = !isFlying;
-                System.out.println(isFlying);
+                flyCam.setDragToRotate(istFliegend);
+                istFliegend = !istFliegend;
+                System.out.println(istFliegend);
             }
 
         }
     };
-
-    void initCrossHairs() {
-        setDisplayStatView(false);
-        guiFont = assetManager.loadFont("Interface/Fonts/Default.fnt");
-        BitmapText ch = new BitmapText(guiFont, false);
-        ch.setSize(guiFont.getCharSet().getRenderedSize() * 2);
-        ch.setText("+");
-        ch.setLocalTranslation(settings.getWidth() / 2 - ch.getLineWidth() / 2, settings.getHeight() / 2 + ch.getLineHeight() / 2, 0); //settings.getWidth() / 2 - ch.getLineWidth() / 2, settings.getHeight() / 2 + ch.getLineHeight() / 2, 0
-        guiNode.attachChild(ch);
-    }
-
-    public void initBoard() {
-        boolean lastFieldBlack = true;
-        int x = -7;
-        int y = -7;
-        char letter = 'a';
-        int number = 8;
-        Vector3f pos;
-        String name;
-
-        Box box = new Box(1f, 0.01f, 1f);
-        Material mat = new Material(assetManager,
-                "Common/MatDefs/Misc/Unshaded.j3md");
-        mat.setColor("Color", ColorRGBA.White);
-        Material mat2 = new Material(assetManager,
-                "Common/MatDefs/Misc/Unshaded.j3md");
-        mat2.setColor("Color", ColorRGBA.DarkGray);
-
-        for (int i = 0; i < 8; i++) {
-            for (int j = 0; j < 8; j++) {
-                name = letter + "" + number;
-                System.out.println(name);
-                Geometry geom = new Geometry(name, box);
-                if (lastFieldBlack) {
-                    geom.setMaterial(mat);
-                    lastFieldBlack = false;
-                    geom.setUserData("farbe", "weiss");
-                } else {
-                    geom.setMaterial(mat2);
-                    lastFieldBlack = true;
-                    geom.setUserData("farbe", "schwarz");
-                }
-                pos = new Vector3f(x, 0, y);
-                geom.setLocalTranslation(pos);
-                geom.setUserData("typ", "kachel");
-                geom.setUserData("markiert", false);
-                geom.setUserData("position", name);
-                x += 2;
-                letter++;
-                chessboard.attachChild(geom);
-                positions.put(name, pos);
-            }
-            y += 2;
-            x = -7;
-            lastFieldBlack = !lastFieldBlack;
-            number--;
-            letter = 'a';
-        }
-        rootNode.attachChild(chessboard);
-    }
 
     void initGui() {
         NiftyJmeDisplay niftyDisplay = new NiftyJmeDisplay(
@@ -222,20 +143,20 @@ public class Main extends SimpleApplication implements ScreenController {
         String text = scrn.findNiftyControl("ip", TextField.class).getRealText();
         boolean isWeiss = scrn.findNiftyControl("weiss", RadioButton.class).isActivated();
         if (!text.equals("")) {
-            stub = new BackendSpielAdminStub("http://" + text);
+            adminStub = new BackendSpielAdminStub("http://" + text);
             spielStub = new BackendSpielStub("http://" + text);
             this.zmngr = new Zugmanager(isWeiss);
-            String s = stub.neuesSpiel();
+            String s = adminStub.neuesSpiel();
             ArrayList<D> daten = Xml.toArray(s);
             if (daten.get(0).getProperties().getProperty("klasse").equals("D_OK")) {
-                initPos();
-                initBoard();
-                initRandZiffer();
-                initRandBuchstabe();
-                figuren(spielStub.getAktuelleBelegung());
+                gKonstruktor.initPositionen();
+
+                gKonstruktor.initBrett(assetManager, rootNode);
+                gKonstruktor.initRandZiffer(guiFont, assetManager, rootNode);
+                gKonstruktor.initRandBuchstabe(guiFont, assetManager, rootNode);
+                gKonstruktor.figuren(spielStub.getAktuelleBelegung(), assetManager, rootNode);
                 nifty.gotoScreen("spiel");
                 setKameraPosition(zmngr.getIsWeiss());
-                istHost = true;
             }
         }
     }
@@ -245,35 +166,35 @@ public class Main extends SimpleApplication implements ScreenController {
         String text = scrn.findNiftyControl("ip", TextField.class).getRealText();
         boolean isWeiss = scrn.findNiftyControl("weiss", RadioButton.class).isActivated();
         if (!text.equals("")) {
-            stub = new BackendSpielAdminStub("http://" + text);
+            adminStub = new BackendSpielAdminStub("http://" + text);
             spielStub = new BackendSpielStub("http://" + text);
             this.zmngr = new Zugmanager(isWeiss);
-            initPos();
-            initBoard();
-            initRandZiffer();
-            initRandBuchstabe();
-            figuren(spielStub.getAktuelleBelegung());
+            gKonstruktor.initPositionen();
+            gKonstruktor.initBrett(assetManager, rootNode);
+            gKonstruktor.initRandZiffer(guiFont, assetManager, rootNode);
+            gKonstruktor.initRandBuchstabe(guiFont, assetManager, rootNode);
+            gKonstruktor.figuren(spielStub.getAktuelleBelegung(), assetManager, rootNode);
             aktualisiereHistorie();
             nifty.gotoScreen("spiel");
             setKameraPosition(zmngr.getIsWeiss());
         }
     }
-    
-    public void neuesSpiel(){
+
+    public void neuesSpiel() {
         System.out.println("starte neues Spiel");
-        stub.neuesSpiel();
-        figuren(spielStub.getAktuelleBelegung());
+        adminStub.neuesSpiel();
+        gKonstruktor.figuren(spielStub.getAktuelleBelegung(), assetManager, rootNode);
     }
 
-    public void loadGame() {
+    public void ladenSpiel() {
         System.out.println("neues Spiel");
     }
 
-    public void saveGame() {
+    public void speichernSpiel() {
         System.out.println("neues Spiel");
     }
 
-    public void quitGame() {
+    public void verlassenSpiel() {
         this.stop();
     }
 
@@ -300,7 +221,7 @@ public class Main extends SimpleApplication implements ScreenController {
         return historie;
     }
 
-    void getLegalPositions(String pos) {
+    void getErlaubteZeuge(String pos) {
         String xml = spielStub.getErlaubteZuege(pos);
         List<String> positions = new ArrayList<String>();
         ArrayList<D> data = Xml.toArray(xml);
@@ -308,42 +229,14 @@ public class Main extends SimpleApplication implements ScreenController {
             String s = d.getProperties().getProperty("nach");
             positions.add(s);
         }
-        selectedTile = pos;
-        changeTileColor(positions);
-    }
-
-    void changeTileColor(List<String> plist) {
-        resetTileColor();
-        Material mat = new Material(assetManager,
-                "Common/MatDefs/Misc/Unshaded.j3md");
-        mat.setColor("Color", ColorRGBA.Green);
-        for (String s : plist) {
-            Geometry sp = (Geometry) chessboard.getChild(s);
-            coloredTiles.put(s, sp.getMaterial());
-            sp.setMaterial(mat);
-            sp.getMaterial().setColor("Color", ColorRGBA.Green);
-            sp.setUserData("markiert", true);
-        }
-    }
-
-    void resetTileColor() {
-        if (!coloredTiles.isEmpty()) {
-            for (Map.Entry<String, Material> entry : coloredTiles.entrySet()) {
-                String s = entry.getKey();
-                Material mat = entry.getValue();
-                Geometry g = (Geometry) chessboard.getChild(s);
-                g.setMaterial(mat);
-                g.setUserData("markiert", false);
-            }
-            coloredTiles.clear();
-        }
+        gKonstruktor.gewaehleteKachel = pos;
+        gKonstruktor.markiereKacheln(positions, assetManager);
     }
 
     public void zieheVonGui() {
         String s = "";
         String pattern = "[a-hA-H]{1}[1-8]{1}";
         Pattern r = Pattern.compile(pattern);
-
         Screen scrn = nifty.getCurrentScreen();
         String von = scrn.findNiftyControl("von", TextField.class).getRealText();
         String nach = scrn.findNiftyControl("nach", TextField.class).getRealText();
@@ -353,189 +246,23 @@ public class Main extends SimpleApplication implements ScreenController {
             scrn.findNiftyControl("von", TextField.class).setText(s.subSequence(0, 0));
             scrn.findNiftyControl("nach", TextField.class).setText(s.subSequence(0, 0));
             if (zmngr.getAmZug(spielStub)) {
-                draw(von, nach);
+                ziehe(von, nach);
             }
         }
 
     }
 
-    void draw(String from, String to) {
+    void ziehe(String from, String to) {
         System.out.println("ziehe");
         String xml = spielStub.ziehe(from, to);
         ArrayList<D> data = Xml.toArray(xml);
         if (data.get(0).getProperties().getProperty("klasse").equals("D_OK")) {
-            resetTileColor();
-            figuren(spielStub.getAktuelleBelegung());
+            gKonstruktor.resetKacheln();
+            gKonstruktor.figuren(spielStub.getAktuelleBelegung(), assetManager, rootNode);
             zmngr.setAmZug(false);
-            //aktualisiereHistorie();
         } else {
-            getLegalPositions(to);
+            getErlaubteZeuge(to);
         }
-    }
-
-    void figuren(String xml) {
-        
-        ArrayList<D> data = Xml.toArray(xml);
-        ArrayList<Geometry> geschlageneFiguren = new ArrayList<Geometry>();
-        if (!data.isEmpty()) {
-            chessboard.detachAllChildren();
-            geschlagenW.detachAllChildren();
-            geschlagenS.detachAllChildren();
-            initBoard();
-            for (D d : data) {
-                if (d.getProperties().getProperty("klasse").equals("D_Figur")) {
-                    Geometry g = getGeometry(d.getProperties().getProperty("typ"));
-                    if (d.getProperties().getProperty("isWeiss").equals("true")) {
-                        Material white = new Material(assetManager,
-                                "Common/MatDefs/Misc/Unshaded.j3md");
-                        white.setColor("Color", ColorRGBA.White);
-                        g.setMaterial(white);
-                        g.setUserData("farbe", "weiss");
-                    } else {
-                        Material black = new Material(assetManager,
-                                "Common/MatDefs/Misc/Unshaded.j3md");
-                        black.setColor("Color", ColorRGBA.DarkGray);
-                        g.setMaterial(black);
-                        g.setUserData("farbe", "schwarz");
-                    }
-                    if (!d.getProperties().getProperty("position").equals("")) {
-                        g.setUserData("position", d.getProperties().getProperty("position"));
-                        Vector3f position = positions.get(g.getUserData("position"));
-                        float offset = g.getUserData("yOffset");
-                        position.setY(offset);
-                        g.setLocalTranslation(position);
-                        g.setUserData("typ", "figur");
-                        chessboard.attachChild(g);
-                    } else {
-                        geschlageneFiguren.add(g);
-
-                    }
-                }
-            }
-            if (!geschlageneFiguren.isEmpty()) {
-                zeigeGeschlageneFigur(geschlageneFiguren);
-            }
-            rootNode.attachChild(figurenW);
-            rootNode.attachChild(figurenS);
-        }
-
-    }
-
-    void initPos() {
-        char letter = 'a';
-        int number = 8;
-        int x = -7;
-        int y = -7;
-        Vector3f pos;
-
-        for (int i = 0; i < 8; i++) {
-            for (int j = 0; j < 8; j++) {
-                pos = new Vector3f(x, 0f, y);
-                positions.put(letter + "" + number, pos);
-                x += 2;
-                letter++;
-            }
-            y += 2;
-            x = -7;
-            number--;
-            letter = 'a';
-        }
-        System.out.println(positions);
-    }
-
-    public void initRandZiffer() {
-        float x;
-        float z;
-
-        x = -9f;
-        z = -8f;
-        int nummer = 8;
-        guiFont = assetManager.loadFont("Interface/Fonts/Default.fnt");
-        for (int i = 0; i < 2; i++) {
-            for (int j = 0; j < 8; j++) {
-                BitmapText ch = new BitmapText(guiFont, false);
-                ch.setSize(2f);
-                ch.setText(String.valueOf(nummer));
-                if (i < 1) {
-                    ch.setLocalTranslation(x - 0.5f, 0, z);
-                    ch.rotate(-1.5708f, 0, 0);
-                } else {
-
-                    ch.setLocalTranslation(x + 0.5f, 0, z + 2.5f);
-                    ch.rotate(-1.5708f, 3.14159f, 0);
-                }
-
-                rootNode.attachChild(ch);
-                z += 2;
-                nummer--;
-            }
-
-            nummer = 8;
-            x *= -1;
-            z = -8f;
-
-        }
-
-    }
-
-    public void initRandBuchstabe() {
-        float x = -7f;
-        float z = -10.5f;
-        char buchstabe = 'a';
-        guiFont = assetManager.loadFont("Interface/Fonts/Default.fnt");
-        for (int i = 0; i < 2; i++) {
-            for (int j = 0; j < 8; j++) {
-                BitmapText ch = new BitmapText(guiFont, false);
-                ch.setSize(2f);
-                ch.setText(String.valueOf(buchstabe));
-
-                if (i > 0) {
-                    ch.setLocalTranslation(x - 0.5f, 0, z);
-                    ch.rotate(-1.5708f, 0, 0);
-                } else {
-                    ch.setLocalTranslation(x + 0.5f, 0, z + 2.5f);
-                    ch.rotate(-1.5708f, 3.14159f, 0);
-
-                }
-                rootNode.attachChild(ch);
-                x += 2;
-                buchstabe++;
-
-            }
-            buchstabe = 'a';
-            x = -7;
-            z = 8;
-        }
-    }
-
-    Geometry getGeometry(String type) {
-        Geometry g = null;
-        if (type.equals("Turm")) {
-            g = new Geometry("Turm", new Box(0.5f, 1.5f, 0.5f));
-            g.setUserData("yOffset", 1.5f);
-            g.setUserData("rang", "d");
-        } else if (type.equals("Springer")) {
-            g = new Geometry("Springer", new Dome(Vector3f.ZERO, 2, 4, 1f, false));
-            g.setUserData("yOffset", 0f);
-            g.setUserData("rang", "b");
-        } else if (type.equals("Laeufer")) {
-            g = new Geometry("Laeufer", new Dome(Vector3f.ZERO, 2, 32, 1f, false));
-            g.setUserData("yOffset", 0f);
-            g.setUserData("rang", "c");
-        } else if (type.equals("Koenig")) {
-            g = new Geometry("Koenig", new Dome(Vector3f.ZERO, 32, 32, 0.6f, false));
-            g.setUserData("yOffset", 0f);
-            g.setUserData("rang", "f");
-        } else if (type.equals("Dame")) {
-            g = new Geometry("Dame", new Sphere(32, 32, 0.5f));
-            g.setUserData("yOffset", 0.5f);
-            g.setUserData("rang", "e");
-        } else if (type.equals("Bauer")) {
-            g = new Geometry("Bauer", new Box(0.5f, 0.5f, 0.5f));
-            g.setUserData("yOffset", 0.5f);
-            g.setUserData("rang", "a");
-        }
-        return g;
     }
 
     public void setKameraPosition(boolean isWeiss) {
@@ -574,7 +301,6 @@ public class Main extends SimpleApplication implements ScreenController {
             } else {
                 nachricht += " Verloren!";
             }
-
         } else if (nachricht.equals("SchwarzSchach")) {
             nachricht = "Schwarz im Schach!";
         } else if (nachricht.equals("WeissSchachMatt")) {
@@ -592,78 +318,36 @@ public class Main extends SimpleApplication implements ScreenController {
         listBox.addItem(nachricht);
     }
 
-    private void zeigeGeschlageneFigur(ArrayList<Geometry> geschlageneFiguren) {
-        Collections.sort(geschlageneFiguren, new Comparator<Geometry>() {
-            public int compare(Geometry o1, Geometry o2) {
-                String s = (String) o1.getUserData("rang");
-                String s2 = (String) o2.getUserData("rang");
-                return s.compareTo(s2);
-            }
-        });
-        for (Geometry g : geschlageneFiguren) {
-            String farbe = g.getUserData("farbe");
-            int count = 0;
-            float x = 0, z = 0, y = g.getUserData("yOffset");
-            if (farbe.equals("weiss")) {
-                geschlagenW.attachChild(g);
-                count = geschlagenW.getQuantity();
-                if (count > 8) {
-                    z = -13f;
-                    x = -25f + (2 * count);
-                } else {
-                    z = -11f;
-                    x = -9f + (2 * count);
-                }
-
-            } else if (farbe.equals("schwarz")) {
-                geschlagenS.attachChild(g);
-                count = geschlagenS.getQuantity();
-                if (count > 8) {
-                    z = 13f;
-                    x = 25f - (2 * count);
-                } else {
-                    z = 11f;
-                    x = 9f - (2 * count);
-                }
-            }
-            Vector3f position = new Vector3f(x, y, z);
-            g.setLocalTranslation(position);
-        }
-        rootNode.attachChild(geschlagenW);
-        rootNode.attachChild(geschlagenS);
-    }
-
     @NiftyEventSubscriber(pattern = "historieW")
     public void listBoxWausgewaehlt(final String id, final ListBoxSelectionChangedEvent<String> event) {
         List<Integer> auswahl = event.getSelectionIndices();
-        if(auswahl.size() > 0){
+        if (auswahl.size() > 0) {
             istPausiert = true;
             int index = auswahl.get(0);
-            index+=index+1;
-            figuren(spielStub.getBelegung(index));
+            index += index + 1;
+            gKonstruktor.figuren(spielStub.getAktuelleBelegung(), assetManager, rootNode);
             Screen screen = nifty.getScreen("spiel");
             ListBox listBox = screen.findNiftyControl("historieW", ListBox.class);
             listBox.deselectItemByIndex(auswahl.get(0));
         }
     }
-    
+
     @NiftyEventSubscriber(pattern = "historieS")
     public void listBoxSausgewaehlt(final String id, final ListBoxSelectionChangedEvent<String> event) {
         List<Integer> auswahl = event.getSelectionIndices();
-        if(auswahl.size() > 0){
+        if (auswahl.size() > 0) {
             istPausiert = true;
             int index = auswahl.get(0);
-            index+=index+2;
-            figuren(spielStub.getBelegung(index));
+            index += index + 2;
+            gKonstruktor.figuren(spielStub.getAktuelleBelegung(), assetManager, rootNode);
             Screen screen = nifty.getScreen("spiel");
             ListBox listBox = screen.findNiftyControl("historieS", ListBox.class);
             listBox.deselectItemByIndex(auswahl.get(0));
         }
     }
-    
-    public void weiterspielen(){
-        System.out.println("test");
+
+    public void weiterspielen() {
         istPausiert = false;
-        figuren(spielStub.getAktuelleBelegung());
+        gKonstruktor.figuren(spielStub.getAktuelleBelegung(), assetManager, rootNode);
     }
 }
