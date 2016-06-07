@@ -9,7 +9,7 @@ import restClient.BackendSpielStub;
 import java.util.ArrayList;
 
 /**
- *
+ * Liefert Information, ob ein Spieler am Zug ist.
  * @author ivan
  */
 public class Zugmanager {
@@ -17,6 +17,10 @@ public class Zugmanager {
     private boolean isWeiss;
     private boolean amZug;
 
+    /**
+     * Setzt die isWeiss variable und bestimmt anhand dieser gleich, ob der Spieler am Zug ist.
+     * @param isWeiss true: Spieler spielt Weiss. false: Spieler spielt Schwarz.
+     */
     public Zugmanager(boolean isWeiss) {
         if (isWeiss) {
             this.amZug = true;
@@ -40,7 +44,12 @@ public class Zugmanager {
         return this.amZug;
     }
 
-    boolean getAmZug(BackendSpielStub spielStub) {
+    /**
+     * Sendet eine Spieldaten-Anfrage an den Server um mit der Anzahl der Züge zu bestimmen, ob der Spieler dran ist.
+     * @param spielStub Rest Client stub.
+     * @return Wahrheitswert, ob der Spieler am Zug ist oder nicht.
+     */
+    public boolean getAmZug(BackendSpielStub spielStub) {
         boolean amZug = false;
         String xml = spielStub.getSpielDaten();
         int anzahlZeuge;

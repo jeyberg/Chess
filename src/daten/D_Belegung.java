@@ -1,7 +1,7 @@
 package daten;
 
 import daten.D;
-
+/** @author Frank Dopatka */
 public class D_Belegung extends D{
 	
 	public D_Belegung(){

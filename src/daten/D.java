@@ -8,6 +8,7 @@ import mygame.Xml;
 import mygame.Xml;
 
 // Basis-Datencontainer
+/** @author Frank Dopatka */
 public class D{
 	private Properties p=new Properties();
 

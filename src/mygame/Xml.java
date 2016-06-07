@@ -9,9 +9,12 @@ import java.util.ArrayList;
 import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 import mygame.Parameter;
 
+/**
+ * Erlaubt es D* Objekte oder eine ArrayList<D> aus einem String in xml Format zu erzeugen.
+ * @author Frank Dopatka
+ */
 public class Xml {
 	public static final String xmlHeaderProperty="<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n<!DOCTYPE properties SYSTEM \"http://java.sun.com/dtd/properties.dtd\">\n";
 	public static final String xmlHeaderArray="<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n<!DOCTYPE properties SYSTEM \"http://www.frankdopatka.de/dtd/propertiesarray.dtd\">\n<propertiesarray>\n";

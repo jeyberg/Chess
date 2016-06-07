@@ -1,5 +1,5 @@
 package restClient;
-
+/** @author Frank Dopatka */
 public interface iBackendSpiel {
 	String getSpielDaten();
 	String getAktuelleBelegung();
