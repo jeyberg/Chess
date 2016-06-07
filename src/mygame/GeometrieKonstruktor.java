@@ -15,7 +15,6 @@ import com.jme3.scene.Node;
 import com.jme3.scene.shape.Box;
 import com.jme3.scene.shape.Dome;
 import com.jme3.scene.shape.Sphere;
-import com.jme3.system.AppSettings;
 import daten.D;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -23,9 +22,10 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.lwjgl.opengl.Display;
 
 /**
- *
+ * Übernimmt Manipulation und Erstellung von 3D Objekten.
  * @author ivan
  */
 public class GeometrieKonstruktor {
@@ -39,7 +39,18 @@ public class GeometrieKonstruktor {
     Node figurenW = new Node("figurenW");
     Node schachbrett = new Node("chessboard");
 
-    void zeigeGeschlageneFiguren(ArrayList<Geometry> geschlageneFiguren, Node rootNode) {
+    /**
+     * Stellt die im Verlauf der Partie geschlagene Figuren dar. Schwarze
+     * Figuren werden auf der Seite von Weiss dargestellt und umgekehrt. Die
+     * Liste der Figuren wird nach Folgender Rangfolge sortiert: Dame > Turm >
+     * Läufer > Springer > Bauer.
+     *
+     * @param geschlageneFiguren Liste von Geometry Objekten, die die
+     * geschlagenen Figuren darstellen.
+     * @param rootNode Das oberste Node Objekt. Siehe jMonkey Dokumentation für
+     * mehr Info über Node.
+     */
+    public void zeigeGeschlageneFiguren(ArrayList<Geometry> geschlageneFiguren, Node rootNode) {
         Collections.sort(geschlageneFiguren, new Comparator<Geometry>() {
             public int compare(Geometry o1, Geometry o2) {
                 String s = (String) o1.getUserData("rang");
@@ -81,6 +92,13 @@ public class GeometrieKonstruktor {
         rootNode.attachChild(geschlagenS);
     }
 
+    /**
+     * Stellt die Kacheln eines Schachbretts dar.
+     *
+     * @param assetManager Wird benötigt um den Shader für die Kacheln zu laden.
+     * @param rootNode Das oberste Node Objekt. Siehe jMonkey Dokumentation für
+     * mehr Info über Node.
+     */
     public void initBrett(AssetManager assetManager, Node rootNode) {
         boolean lastFieldBlack = true;
         int x = -7;
@@ -97,7 +115,6 @@ public class GeometrieKonstruktor {
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
                 name = letter + "" + number;
-                System.out.println(name);
                 Geometry geom = new Geometry(name, box);
                 if (lastFieldBlack) {
                     geom.setMaterial(weiss);
@@ -127,17 +144,36 @@ public class GeometrieKonstruktor {
         rootNode.attachChild(schachbrett);
     }
 
-    BitmapText initFadenkreuz(BitmapFont font, Main main, AssetManager assetManager, AppSettings settings) {
+    /**
+     * Initialisiert die Anzeige für das Fadenkreuz.
+     *
+     * @param guiFont Globales Objekt der Oberklasse von Main, zeigt auf das vom
+     * assetManager geladene Font.
+     * @param main Referenz auf das Main Objekt, das die Methode aufruft.
+     * @param assetManager Objekt zum Laden von Assets wie Bilder, Shader,
+     * Fonts.
+     * @return Ein BitmapText Objekt, welches das "+" enthält.
+     */
+    public BitmapText initFadenkreuz(BitmapFont guiFont, Main main, AssetManager assetManager) {
         main.setDisplayStatView(false);
-        font = assetManager.loadFont("Interface/Fonts/Default.fnt");
-        BitmapText ch = new BitmapText(font, false);
-        ch.setSize(font.getCharSet().getRenderedSize() * 2);
+        guiFont = assetManager.loadFont("Interface/Fonts/Default.fnt");
+        BitmapText ch = new BitmapText(guiFont, false);
+        ch.setSize(guiFont.getCharSet().getRenderedSize() * 2);
         ch.setText("+");
-        ch.setLocalTranslation(settings.getWidth() / 2 - ch.getLineWidth() / 2, settings.getHeight() / 2 + ch.getLineHeight() / 2, 0);
+        ch.setLocalTranslation(Display.getWidth() / 2 - ch.getLineWidth() / 2, Display.getHeight() / 2 + ch.getLineHeight() / 2, 0);
         return ch;
     }
 
-    Geometry getGeometry(String type) {
+    /**
+     * Erstellt ein Geometry Objekt basierend auf dem type Parameter und gibt es
+     * zurück. Im Objekt werden noch zusätzliche Daten gespeichert: yOffset für
+     * die korrekte Darstellung auf dem Brett und "rang" für die Sortierung in
+     * zeigeGeschlageneFigur.
+     *
+     * @param type Typ der darzustellenden Figur, also Dame, Turm, etc.
+     * @return Ein Geometry Objekt mit entsprechenden Daten und Form.
+     */
+    public Geometry getGeometry(String type) {
         Geometry g = null;
         if (type.equals("Turm")) {
             g = new Geometry("Turm", new Box(0.5F, 1.5F, 0.5F));
@@ -167,7 +203,15 @@ public class GeometrieKonstruktor {
         return g;
     }
 
-    void markiereKacheln(List<String> plist, AssetManager assetManager) {
+    /**
+     * Markiert Kacheln, um die möglichen Züge einer Figur darzustellen.
+     *
+     * @param plist Liste der Koordinaten der Kacheln, die markiert werden
+     * sollen.
+     * @param assetManager Objekt zum Laden von Assets wie Bilder, Shader,
+     * Fonts.
+     */
+    public void markiereKacheln(List<String> plist, AssetManager assetManager) {
         resetKacheln();
         Material mat = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
         mat.setColor("Color", ColorRGBA.Green);
@@ -175,12 +219,14 @@ public class GeometrieKonstruktor {
             Geometry sp = (Geometry) schachbrett.getChild(s);
             markierteKacheln.put(s, sp.getMaterial());
             sp.setMaterial(mat);
-            sp.getMaterial().setColor("Color", ColorRGBA.Green);
             sp.setUserData("markiert", true);
         }
     }
 
-    void resetKacheln() {
+    /**
+     * Setzt zuvor markierte Kacheln auf ihre ursprüngliche Farbe zurück.
+     */
+    public void resetKacheln() {
         if (!markierteKacheln.isEmpty()) {
             for (Map.Entry<String, Material> entry : markierteKacheln.entrySet()) {
                 String s = entry.getKey();
@@ -193,6 +239,17 @@ public class GeometrieKonstruktor {
         }
     }
 
+    /**
+     * Stellt die Ziffern am Rand des Bretts dar. Die Ziffern auf der linken
+     * Seite des Bretts (von Schwarz / Weiss aus gesehen) sind dem Betrachter
+     * zugewendet.
+     *
+     * @param guiFont Objekt zum Erstellen eines BitmapText Objeks
+     * @param assetManager Objekt zum Laden von Assets wie Bilder, Shader,
+     * Fonts.
+     * @param rootNode Das oberste Node Objekt. Siehe jMonkey Dokumentation für
+     * mehr Info über Node.
+     */
     public void initRandZiffer(BitmapFont guiFont, AssetManager assetManager, Node rootNode) {
         float x = -9.0F;
         float z = -8.0F;
@@ -220,7 +277,12 @@ public class GeometrieKonstruktor {
         }
     }
 
-    void initPositionen() {
+    /**
+     * Initialisiert die positionen Hashmap. Key: Schabrettkoordinate in
+     * Schachnotation. Value: Vector3f Objekt mit Koordinaten entsprechend dem
+     * Key.
+     */
+    public void initPositionen() {
         char letter = 'a';
         int number = 8;
         int x = -7;
@@ -240,6 +302,17 @@ public class GeometrieKonstruktor {
         }
     }
 
+    /**
+     * Stellt die Buchstaben am Rand des Bretts dar. Die Buchstaben auf der
+     * linken Seite des Bretts (von Schwarz / Weiss aus gesehen) sind dem
+     * Betrachter zugewendet.
+     *
+     * @param guiFont Objekt zum Erstellen eines BitmapText Objeks
+     * @param assetManager Objekt zum Laden von Assets wie Bilder, Shader,
+     * Fonts.
+     * @param rootNode Das oberste Node Objekt. Siehe jMonkey Dokumentation für
+     * mehr Info über Node.
+     */
     public void initRandBuchstabe(BitmapFont guiFont, AssetManager assetManager, Node rootNode) {
         float x = -7.0F;
         float z = -10.5F;
@@ -267,7 +340,21 @@ public class GeometrieKonstruktor {
         }
     }
 
-    void figuren(String xml, AssetManager assetManager, Node rootNode) {
+    /**
+     * Stellt die Figuren, die eine Position besitzen, auf dem Brett dar.
+     * Zusätzliche Daten werden in den Geometry Objekten gespeichert: "farbe".
+     * Um eine Überschneidung der Figuren mit dem Brett zu vermeiden wird die
+     * zuvor in getGeometry gesetzte Eigenschaft "yOffset" benutzt. Figuren, die
+     * über keine Position verfügen, werden an zeigeGeschlageneFigur
+     * weitergegeben.
+     *
+     * @param xml String mit Daten über die Figuren im XML Format.
+     * @param assetManager Objekt zum Laden von Assets wie Bilder, Shader,
+     * Fonts.
+     * @param rootNode Das oberste Node Objekt. Siehe jMonkey Dokumentation für
+     * mehr Info über Node.
+     */
+    public void figuren(String xml, AssetManager assetManager, Node rootNode) {
         ArrayList<D> data = Xml.toArray(xml);
         ArrayList<Geometry> geschlageneFiguren = new ArrayList<Geometry>();
         if (!data.isEmpty()) {

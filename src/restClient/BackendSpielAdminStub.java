@@ -10,7 +10,7 @@ import javax.ws.rs.client.ClientBuilder;
 import daten.D;
 import mygame.Xml;
 import restClient.iBackendSpielAdmin;
-
+/** @author Frank Dopatka */
 public class BackendSpielAdminStub implements iBackendSpielAdmin{
 	private static final String urlUnterPfad="schach/spiel/admin/";
 	private static final boolean log=true;

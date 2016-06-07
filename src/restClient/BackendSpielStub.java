@@ -10,7 +10,7 @@ import mygame.Xml;
 import mygame.Xml;
 import restClient.iBackendSpiel;
 
-
+/** @author Frank Dopatka */
 public class BackendSpielStub implements iBackendSpiel{
 	private static final String urlUnterPfad="schach/spiel/";
 	private static final boolean log=false;
