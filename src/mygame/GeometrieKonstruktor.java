@@ -12,6 +12,7 @@ import com.jme3.math.ColorRGBA;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
+import com.jme3.scene.Spatial;
 import com.jme3.scene.shape.Box;
 import com.jme3.scene.shape.Dome;
 import com.jme3.scene.shape.Sphere;
@@ -32,7 +33,7 @@ public class GeometrieKonstruktor {
 
     Node geschlagenS = new Node("geschlagenS");
     String gewaehleteKachel;
-    Map<String, Material> markierteKacheln = new HashMap<String, Material>();
+    Map<String, String> markierteKacheln = new HashMap<String, String>();
     Node figurenS = new Node("figurenS");
     Map<String, Vector3f> positionen = new HashMap<String, Vector3f>();
     Node geschlagenW = new Node("geschlagenW");
@@ -68,20 +69,20 @@ public class GeometrieKonstruktor {
                 geschlagenW.attachChild(g);
                 count = geschlagenW.getQuantity();
                 if (count > 8) {
-                    z = -13.0F;
+                    z = -15.0F;
                     x = -25.0F + (2 * count);
                 } else {
-                    z = -11.0F;
+                    z = -13.0F;
                     x = -9.0F + (2 * count);
                 }
             } else if (farbe.equals("schwarz")) {
                 geschlagenS.attachChild(g);
                 count = geschlagenS.getQuantity();
                 if (count > 8) {
-                    z = 13.0F;
+                    z = 15.0F;
                     x = 25.0F - (2 * count);
                 } else {
-                    z = 11.0F;
+                    z = 13.0F;
                     x = 9.0F - (2 * count);
                 }
             }
@@ -107,32 +108,44 @@ public class GeometrieKonstruktor {
         int number = 8;
         Vector3f pos;
         String name;
-        Box box = new Box(1.0F, 0.01F, 1.0F);
+        
+        /*Box box = new Box(1.0F, 0.01F, 1.0F);
         Material weiss = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
         weiss.setColor("Color", ColorRGBA.White);
         Material schwarz = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
-        schwarz.setColor("Color", ColorRGBA.DarkGray);
+        schwarz.setColor("Color", ColorRGBA.DarkGray);*/
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
                 name = letter + "" + number;
-                Geometry geom = new Geometry(name, box);
+                //Geometry geom = new Geometry(name, box);
+                
+                Geometry g;
+                Node tile;
                 if (lastFieldBlack) {
-                    geom.setMaterial(weiss);
+                    //geom.setMaterial(weiss);
+                    //tile = (Node) assetManager.loadModel("Models/chessboard_white_tile/chessboard_white_tile.j3o");
+                    //tile.get
+                    Spatial geom = assetManager.loadModel("Models/chessboard_white_tile/chessboard_white_tile.j3o");
+                    g = getGeometryy(geom);
                     lastFieldBlack = false;
-                    geom.setUserData("farbe", "weiss");
+                    g.setUserData("farbe", "weiss");
                 } else {
-                    geom.setMaterial(schwarz);
+                    //geom.setMaterial(schwarz);
+                    //geom =  (Geometry) assetManager.loadModel("Models/chessboard_black_tile/chessboard_black_tile.j3o");
+                    Spatial geom = assetManager.loadModel("Models/chessboard_black_tile/chessboard_black_tile.j3o");
+                    g = getGeometryy(geom);
                     lastFieldBlack = true;
-                    geom.setUserData("farbe", "schwarz");
+                    g.setUserData("farbe", "schwarz");
                 }
-                pos = new Vector3f(x, 0, y);
-                geom.setLocalTranslation(pos);
-                geom.setUserData("typ", "kachel");
-                geom.setUserData("markiert", false);
-                geom.setUserData("position", name);
+                pos = new Vector3f(x, -1f, y);
+                g.setLocalTranslation(pos);
+                g.setUserData("typ", "kachel");
+                g.setUserData("markiert", false);
+                g.setUserData("position", name);
+                g.setName(name);
                 x += 2;
                 letter++;
-                schachbrett.attachChild(geom);
+                schachbrett.attachChild(g);
                 positionen.put(name, pos);
             }
             y += 2;
@@ -142,6 +155,13 @@ public class GeometrieKonstruktor {
             letter = 'a';
         }
         rootNode.attachChild(schachbrett);
+    }
+    
+    private Geometry getGeometryy(Spatial spatial){
+        if(spatial instanceof Geometry)
+            return (Geometry) spatial;
+        Node node = (Node) spatial;
+        return getGeometryy(node.getChild(0));
     }
 
     /**
@@ -212,12 +232,12 @@ public class GeometrieKonstruktor {
      * Fonts.
      */
     public void markiereKacheln(List<String> plist, AssetManager assetManager) {
-        resetKacheln();
+        resetKacheln(assetManager);
         Material mat = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
         mat.setColor("Color", ColorRGBA.Green);
         for (String s : plist) {
-            Geometry sp = (Geometry) schachbrett.getChild(s);
-            markierteKacheln.put(s, sp.getMaterial());
+            Spatial sp = schachbrett.getChild(s);
+            markierteKacheln.put(s, (String) sp.getUserData("farbe"));
             sp.setMaterial(mat);
             sp.setUserData("markiert", true);
         }
@@ -226,14 +246,27 @@ public class GeometrieKonstruktor {
     /**
      * Setzt zuvor markierte Kacheln auf ihre ursprüngliche Farbe zurück.
      */
-    public void resetKacheln() {
+    public void resetKacheln(AssetManager assetManager) {
         if (!markierteKacheln.isEmpty()) {
-            for (Map.Entry<String, Material> entry : markierteKacheln.entrySet()) {
+            for (Map.Entry<String, String> entry : markierteKacheln.entrySet()) {
                 String s = entry.getKey();
-                Material mat = entry.getValue();
-                Geometry g = (Geometry) schachbrett.getChild(s);
-                g.setMaterial(mat);
-                g.setUserData("markiert", false);
+                String mat = entry.getValue();
+                Geometry tile = null;
+                if(mat.equals("weiss")){
+                    tile = getGeometryy(assetManager.loadModel("Models/chessboard_white_tile/chessboard_white_tile.j3o"));
+                }else if(mat.equals("schwarz")){
+                    tile = getGeometryy(assetManager.loadModel("Models/chessboard_black_tile/chessboard_black_tile.j3o"));
+                }
+                /*Geometry g = (Geometry) schachbrett.getChild(s);
+                g.setMaterial(mat);*/
+                tile.setUserData("typ", "kachel");
+                tile.setUserData("markiert", false);
+                tile.setUserData("position", s);
+                tile.setLocalTranslation(positionen.get(s));
+                schachbrett.detachChildNamed(s);
+                schachbrett.attachChild(tile);
+                
+                
             }
             markierteKacheln.clear();
         }

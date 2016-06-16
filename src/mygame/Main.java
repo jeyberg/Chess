@@ -10,10 +10,13 @@ import com.jme3.input.MouseInput;
 import com.jme3.input.controls.ActionListener;
 import com.jme3.input.controls.KeyTrigger;
 import com.jme3.input.controls.MouseButtonTrigger;
+import com.jme3.light.AmbientLight;
+import com.jme3.math.ColorRGBA;
 import com.jme3.math.Ray;
 import com.jme3.math.Vector3f;
 import com.jme3.niftygui.NiftyJmeDisplay;
 import com.jme3.scene.Geometry;
+import com.jme3.scene.Spatial;
 import de.lessvoid.nifty.Nifty;
 import de.lessvoid.nifty.NiftyEventSubscriber;
 import de.lessvoid.nifty.controls.ListBox;
@@ -58,6 +61,9 @@ public class Main extends SimpleApplication implements ScreenController {
         Display.setResizable(true);
         flyCam.setDragToRotate(true);
         flyCam.setMoveSpeed(15f);
+        AmbientLight al = new AmbientLight();
+        al.setColor(ColorRGBA.White);
+        rootNode.addLight(al);
         initGui();
         guiNode.attachChild(gKonstruktor.initFadenkreuz(guiFont, this, assetManager));
         initBelegung();
@@ -129,6 +135,7 @@ public class Main extends SimpleApplication implements ScreenController {
                 Ray ray = new Ray(cam.getLocation(), cam.getDirection());
                 gKonstruktor.schachbrett.collideWith(ray, results);
                 if (results.size() > 0) {
+                    //Spatial g = results.getClosestCollision().getGeometry().getParent().getParent().getParent().getParent();
                     Geometry g = results.getClosestCollision().getGeometry();
                     String pos = g.getUserData("position");
                     String typ = g.getUserData("typ");
@@ -336,7 +343,7 @@ public class Main extends SimpleApplication implements ScreenController {
         String xml = spielStub.ziehe(from, to);
         ArrayList<D> data = Xml.toArray(xml);
         if (data.get(0).getProperties().getProperty("klasse").equals("D_OK")) {
-            gKonstruktor.resetKacheln();
+            gKonstruktor.resetKacheln(assetManager);
             gKonstruktor.figuren(spielStub.getAktuelleBelegung(), assetManager, rootNode);
             zmngr.setAmZug(false);
         } else {
@@ -351,9 +358,9 @@ public class Main extends SimpleApplication implements ScreenController {
      */
     public void setKameraPosition(boolean isWeiss) {
         if (isWeiss) {
-            cam.setLocation(new Vector3f(0f, 10f, 25f));
+            cam.setLocation(new Vector3f(0f, 20f, 25f));
         } else {
-            cam.setLocation(new Vector3f(0f, 10f, -25f));
+            cam.setLocation(new Vector3f(0f, 20f, -25f));
         }
         cam.lookAt(new Vector3f(0f, 0f, 0f), Vector3f.UNIT_Y);
     }
