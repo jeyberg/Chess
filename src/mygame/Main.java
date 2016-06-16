@@ -22,6 +22,7 @@ import de.lessvoid.nifty.NiftyEventSubscriber;
 import de.lessvoid.nifty.controls.ListBox;
 import de.lessvoid.nifty.controls.ListBoxSelectionChangedEvent;
 import de.lessvoid.nifty.controls.RadioButton;
+import de.lessvoid.nifty.controls.RadioButtonGroupStateChangedEvent;
 import de.lessvoid.nifty.controls.TextField;
 import de.lessvoid.nifty.screen.Screen;
 import de.lessvoid.nifty.screen.ScreenController;
@@ -216,6 +217,11 @@ public class Main extends SimpleApplication implements ScreenController {
             nifty.gotoScreen("spiel");
             setKameraPosition(zmngr.getIsWeiss());
         }
+    }
+    
+    @NiftyEventSubscriber(id="skin")
+    public void onSkinGoupChanged(final String id, final RadioButtonGroupStateChangedEvent event){
+        gKonstruktor.setSkinPfad(event.getSelectedId());
     }
 
     /**
