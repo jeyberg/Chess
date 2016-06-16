@@ -33,6 +33,10 @@ public class GeometrieKonstruktor {
 
     Node geschlagenS = new Node("geschlagenS");
     String gewaehleteKachel;
+    String skinPfadSchwarz;
+    String skinPfadWeiss;
+    String skinPfadFigurSchwarz;
+    String skinPfadFigurWeiss;
     Map<String, String> markierteKacheln = new HashMap<String, String>();
     Node figurenS = new Node("figurenS");
     Map<String, Vector3f> positionen = new HashMap<String, Vector3f>();
@@ -427,6 +431,19 @@ public class GeometrieKonstruktor {
             }
             rootNode.attachChild(figurenW);
             rootNode.attachChild(figurenS);
+        }
+    }
+
+    void setSkinPfad(String selectedId) {
+        if(selectedId.equals("marmor")){
+            skinPfadSchwarz = "Models/chessboard_black_tile/chessboard_black_tile.j3o";
+            skinPfadWeiss = "Models/chessboard_white_tile/chessboard_white_tile.j3o";
+        }else if(selectedId.equals("holz_alt")){
+            
+        }else if(selectedId.equals("holz_jung")){
+            
+        }else if(selectedId.equals("glas")){
+            
         }
     }
 }

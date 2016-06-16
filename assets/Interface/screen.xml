@@ -64,6 +64,26 @@
                         <control name="radioButton" id="schwarz" group="farbwahl" />
                     </panel>
                 </panel>
+                <control name="label" text="Wähle ein Skin aus"/>
+                <control id="skin" name="radioButtonGroup"/>
+                <panel childLayout="vertical">
+                    <panel childLayout="horizontal">
+                        <control name="label" text="Marmor" with="60px" />
+                        <control name="radioButton" id="marmor" group="skin" />
+                    </panel>
+                    <panel childLayout="horizontal">
+                        <control name="label" text="Holz (Alt)" with="60px" />
+                        <control name="radioButton" id="holz_alt" group="skin" />
+                    </panel>
+                    <panel childLayout="horizontal">
+                        <control name="label" text="Holz (Jung)" with="60px" />
+                        <control name="radioButton" id="holz_jung" group="skin" />
+                    </panel>
+                    <panel childLayout="horizontal">
+                        <control name="label" text="Glas" with="60px" />
+                        <control name="radioButton" id="glas" group="skin" />
+                    </panel>
+                </panel>
                 <control name="button" id="neuesSpiel" label="Spiel erstellen" align="center">
                     <interact onClick="spielErstellen()"/>
                 </control>
