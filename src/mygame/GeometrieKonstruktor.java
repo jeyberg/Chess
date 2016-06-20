@@ -68,7 +68,7 @@ public class GeometrieKonstruktor {
             int count = 0;
             float x = 0;
             float z = 0;
-            float y = g.getUserData("yOffset");
+            float y = 0.0f;
             if (farbe.equals("weiss")) {
                 geschlagenW.attachChild(g);
                 count = geschlagenW.getQuantity();
@@ -121,23 +121,15 @@ public class GeometrieKonstruktor {
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
                 name = letter + "" + number;
-                //Geometry geom = new Geometry(name, box);
-                
                 Geometry g;
-                Node tile;
                 if (lastFieldBlack) {
-                    //geom.setMaterial(weiss);
-                    //tile = (Node) assetManager.loadModel("Models/chessboard_white_tile/chessboard_white_tile.j3o");
-                    //tile.get
                     Spatial geom = assetManager.loadModel("Models/chessboard_white_tile/chessboard_white_tile.j3o");
-                    g = getGeometryy(geom);
+                    g = getGeometryFromSpatial(geom);
                     lastFieldBlack = false;
                     g.setUserData("farbe", "weiss");
                 } else {
-                    //geom.setMaterial(schwarz);
-                    //geom =  (Geometry) assetManager.loadModel("Models/chessboard_black_tile/chessboard_black_tile.j3o");
                     Spatial geom = assetManager.loadModel("Models/chessboard_black_tile/chessboard_black_tile.j3o");
-                    g = getGeometryy(geom);
+                    g = getGeometryFromSpatial(geom);
                     lastFieldBlack = true;
                     g.setUserData("farbe", "schwarz");
                 }
@@ -161,11 +153,17 @@ public class GeometrieKonstruktor {
         rootNode.attachChild(schachbrett);
     }
     
-    private Geometry getGeometryy(Spatial spatial){
+    /**
+     * Holt das Geometry Objekt aus dem übergebenem Spatial.
+     * Das erlaubt ein einfacheres Handeln der Figuren.
+     * @param spatial
+     * @return das Geometry Objekt im Spatial
+     */
+    private Geometry getGeometryFromSpatial(Spatial spatial){
         if(spatial instanceof Geometry)
             return (Geometry) spatial;
         Node node = (Node) spatial;
-        return getGeometryy(node.getChild(0));
+        return getGeometryFromSpatial(node.getChild(0));
     }
 
     /**
@@ -197,33 +195,53 @@ public class GeometrieKonstruktor {
      * @param type Typ der darzustellenden Figur, also Dame, Turm, etc.
      * @return Ein Geometry Objekt mit entsprechenden Daten und Form.
      */
-    public Geometry getGeometry(String type) {
+    public Geometry getGeometry(String type, AssetManager assetManager, boolean istWeiss) {
         Geometry g = null;
         if (type.equals("Turm")) {
-            g = new Geometry("Turm", new Box(0.5F, 1.5F, 0.5F));
-            g.setUserData("yOffset", 1.5F);
+            if(istWeiss){
+                g = getGeometryFromSpatial(assetManager.loadModel("Models/bauerw/bauerw.j3o"));
+            }else{
+                g = getGeometryFromSpatial(assetManager.loadModel("Models/bauersmaterial/bauers.material.j3o"));
+            }  
             g.setUserData("rang", "d");
         } else if (type.equals("Springer")) {
-            g = new Geometry("Springer", new Dome(Vector3f.ZERO, 2, 4, 1.0F, false));
-            g.setUserData("yOffset", 0.0F);
+            if(istWeiss){
+                g = getGeometryFromSpatial(assetManager.loadModel("Models/bauerw/bauerw.j3o"));
+            }else{
+                g = getGeometryFromSpatial(assetManager.loadModel("Models/bauersmaterial/bauers.material.j3o"));
+            }  
             g.setUserData("rang", "b");
         } else if (type.equals("Laeufer")) {
-            g = new Geometry("Laeufer", new Dome(Vector3f.ZERO, 2, 32, 1.0F, false));
-            g.setUserData("yOffset", 0.0F);
+            if(istWeiss){
+                g = getGeometryFromSpatial(assetManager.loadModel("Models/bauerw/bauerw.j3o"));
+            }else{
+                g = getGeometryFromSpatial(assetManager.loadModel("Models/bauersmaterial/bauers.material.j3o"));
+            }  
             g.setUserData("rang", "c");
         } else if (type.equals("Koenig")) {
-            g = new Geometry("Koenig", new Dome(Vector3f.ZERO, 32, 32, 0.6F, false));
-            g.setUserData("yOffset", 0.0F);
+            if(istWeiss){
+                g = getGeometryFromSpatial(assetManager.loadModel("Models/bauerw/bauerw.j3o"));
+            }else{
+                g = getGeometryFromSpatial(assetManager.loadModel("Models/bauersmaterial/bauers.material.j3o"));
+            }  
             g.setUserData("rang", "f");
         } else if (type.equals("Dame")) {
-            g = new Geometry("Dame", new Sphere(32, 32, 0.5F));
-            g.setUserData("yOffset", 0.5F);
+            if(istWeiss){
+                g = getGeometryFromSpatial(assetManager.loadModel("Models/bauerw/bauerw.j3o"));
+            }else{
+                g = getGeometryFromSpatial(assetManager.loadModel("Models/bauersmaterial/bauers.material.j3o"));
+            }  
             g.setUserData("rang", "e");
         } else if (type.equals("Bauer")) {
-            g = new Geometry("Bauer", new Box(0.5F, 0.5F, 0.5F));
-            g.setUserData("yOffset", 0.5F);
+            if(istWeiss){
+                g = getGeometryFromSpatial(assetManager.loadModel("Models/bauerw/bauerw.j3o"));
+            }else{
+                g = getGeometryFromSpatial(assetManager.loadModel("Models/bauersmaterial/bauers.material.j3o"));
+            }                        
             g.setUserData("rang", "a");
+            g.setName("Bauer");
         }
+        g.setLocalScale(0.1f, 0.1f, 0.1f);
         return g;
     }
 
@@ -257,9 +275,9 @@ public class GeometrieKonstruktor {
                 String mat = entry.getValue();
                 Geometry tile = null;
                 if(mat.equals("weiss")){
-                    tile = getGeometryy(assetManager.loadModel("Models/chessboard_white_tile/chessboard_white_tile.j3o"));
+                    tile = getGeometryFromSpatial(assetManager.loadModel("Models/chessboard_white_tile/chessboard_white_tile.j3o"));
                 }else if(mat.equals("schwarz")){
-                    tile = getGeometryy(assetManager.loadModel("Models/chessboard_black_tile/chessboard_black_tile.j3o"));
+                    tile = getGeometryFromSpatial(assetManager.loadModel("Models/chessboard_black_tile/chessboard_black_tile.j3o"));
                 }
                 /*Geometry g = (Geometry) schachbrett.getChild(s);
                 g.setMaterial(mat);*/
@@ -401,23 +419,19 @@ public class GeometrieKonstruktor {
             initBrett(assetManager, rootNode);
             for (D d : data) {
                 if (d.getProperties().getProperty("klasse").equals("D_Figur")) {
-                    Geometry g = getGeometry(d.getProperties().getProperty("typ"));
+                    Geometry g = null;
                     if (d.getProperties().getProperty("isWeiss").equals("true")) {
-                        Material white = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
-                        white.setColor("Color", ColorRGBA.White);
-                        g.setMaterial(white);
+                        g = getGeometry(d.getProperties().getProperty("typ"), assetManager, true);
                         g.setUserData("farbe", "weiss");
                     } else {
-                        Material black = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
-                        black.setColor("Color", ColorRGBA.DarkGray);
-                        g.setMaterial(black);
+                        g = getGeometry(d.getProperties().getProperty("typ"), assetManager, false);
                         g.setUserData("farbe", "schwarz");
                     }
                     if (!d.getProperties().getProperty("position").equals("")) {
                         g.setUserData("position", d.getProperties().getProperty("position"));
                         Vector3f position = positionen.get(g.getUserData("position"));
-                        float offset = g.getUserData("yOffset");
-                        position.setY(offset);
+                        //float offset = g.getUserData("yOffset");
+                        position.setY(0.0f);
                         g.setLocalTranslation(position);
                         g.setUserData("typ", "figur");
                         schachbrett.attachChild(g);
