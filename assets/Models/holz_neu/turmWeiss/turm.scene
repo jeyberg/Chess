@@ -1,0 +1,52 @@
+<scene previous_export_time="1466552751.2977388" formatVersion="1.0.1" export_time="1466552850.6590898" exported_by="Martin Watolla" >
+  <nodes >
+    <node name="Plane" >
+      <position z="-0.000000" x="0.000000" y="-10.774938" />
+      <rotation qx="0.000000" qz="-0.000000" qw="1.000000" qy="0.000000" />
+      <scale z="1.000000" x="1.000000" y="1.000000" />
+      <game >
+        <sensors />
+        <actuators />
+      </game>
+      <entity friction_y="1.0" physics_type="STATIC" lock_rot_x="False" lock_trans_y="False" velocity_min="0.0" damping_trans="0.03999999910593033" velocity_max="0.0" lock_trans_x="False" ghost="False" damping_rot="0.10000000149011612" mass="1.0" mass_radius="1.0" name="Plane" inertia_tensor="0.4000000059604645" actor="False" friction_x="1.0" lock_rot_z="False" anisotropic_friction="False" lock_trans_z="False" lock_rot_y="False" friction_z="1.0" meshFile="Plane.mesh" />
+    </node>
+    <node name="Lamp" >
+      <position z="-1.005454" x="4.076245" y="5.903862" />
+      <rotation qx="0.169076" qz="-0.272171" qw="0.570947" qy="0.755880" />
+      <scale z="1.000000" x="1.000000" y="1.000000" />
+      <game >
+        <sensors />
+        <actuators />
+      </game>
+      <light shadow="true" powerScale="1.0" type="point" name="Lamp" >
+        <position z="-1.005454" x="4.076245" y="5.903862" />
+        <lightAttenuation quadratic="0.0" range="5000" linear="0.03333335240683057" constant="1.0" />
+        <colourDiffuse g="1.0" b="1.0" r="1.0" />
+        <colourSpecular g="1.0" b="1.0" r="1.0" />
+        <colourShadow g="1.0" b="1.0" r="1.0" />
+      </light>
+    </node>
+    <node name="Camera" >
+      <position z="6.507640" x="7.481132" y="5.343665" />
+      <rotation qx="0.481707" qz="-0.212922" qw="0.781600" qy="0.334251" />
+      <scale z="1.000000" x="1.000000" y="1.000000" />
+      <game >
+        <sensors />
+        <actuators />
+      </game>
+      <camera fov="0.5033799435163735" projectionType="perspective" name="Camera" >
+        <clipping farPlaneDist="100.0" near="0.10000000149011612" far="100.0" nearPlaneDist="0.10000000149011612" />
+      </camera>
+    </node>
+  </nodes>
+  <externals >
+    <item type="material" >
+      <file name="C:\Users\Martin Watolla\Desktop\Texturen\Holz_Neu\TurmWeiss\Material.material" />
+    </item>
+  </externals>
+  <environment >
+    <colourBackground g="0.05087608844041824" b="0.05087608844041824" r="0.05087608844041824" />
+    <colourDiffuse g="0.05087608844041824" b="0.05087608844041824" r="0.05087608844041824" />
+    <colourAmbient g="0.0" b="0.0" r="0.0" />
+  </environment>
+</scene>

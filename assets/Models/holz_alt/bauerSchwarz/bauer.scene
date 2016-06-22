@@ -1,0 +1,52 @@
+<scene export_time="1466546452.423178" formatVersion="1.0.1" exported_by="Martin Watolla" previous_export_time="1466546242.9437866" >
+  <nodes >
+    <node name="bauer" >
+      <position x="0.000000" z="-0.000000" y="-8.737115" />
+      <rotation qw="0.000000" qz="-0.000000" qx="0.000000" qy="1.000000" />
+      <scale x="1.000000" z="1.000000" y="1.000000" />
+      <game >
+        <sensors />
+        <actuators />
+      </game>
+      <entity velocity_min="0.0" damping_trans="0.03999999910593033" lock_rot_x="False" mass="1.0" lock_trans_z="False" lock_rot_z="False" ghost="False" actor="False" damping_rot="0.10000000149011612" velocity_max="0.0" mass_radius="1.0" meshFile="Plane.mesh" physics_type="STATIC" lock_trans_y="False" name="Plane" friction_x="1.0" friction_y="1.0" anisotropic_friction="False" lock_trans_x="False" friction_z="1.0" lock_rot_y="False" inertia_tensor="0.4000000059604645" />
+    </node>
+    <node name="Lamp" >
+      <position x="4.076245" z="-1.005454" y="5.903862" />
+      <rotation qw="0.570947" qz="-0.272171" qx="0.169076" qy="0.755880" />
+      <scale x="1.000000" z="1.000000" y="1.000000" />
+      <game >
+        <sensors />
+        <actuators />
+      </game>
+      <light type="point" shadow="true" powerScale="1.0" name="Lamp" >
+        <position x="4.076245" z="-1.005454" y="5.903862" />
+        <lightAttenuation constant="1.0" quadratic="0.0" range="5000" linear="0.03333335240683057" />
+        <colourDiffuse b="1.0" r="1.0" g="1.0" />
+        <colourSpecular b="1.0" r="1.0" g="1.0" />
+        <colourShadow b="1.0" r="1.0" g="1.0" />
+      </light>
+    </node>
+    <node name="Camera" >
+      <position x="7.481132" z="6.507640" y="5.343665" />
+      <rotation qw="0.781600" qz="-0.212922" qx="0.481707" qy="0.334251" />
+      <scale x="1.000000" z="1.000000" y="1.000000" />
+      <game >
+        <sensors />
+        <actuators />
+      </game>
+      <camera projectionType="perspective" fov="0.5033799435163735" name="Camera" >
+        <clipping far="100.0" near="0.10000000149011612" farPlaneDist="100.0" nearPlaneDist="0.10000000149011612" />
+      </camera>
+    </node>
+  </nodes>
+  <externals >
+    <item type="material" >
+      <file name="C:\Users\Martin Watolla\Desktop\Texturen\Holz_Alt\BauerSchwarz\Material.material" />
+    </item>
+  </externals>
+  <environment >
+    <colourDiffuse b="0.05087608844041824" r="0.05087608844041824" g="0.05087608844041824" />
+    <colourAmbient b="0.0" r="0.0" g="0.0" />
+    <colourBackground b="0.05087608844041824" r="0.05087608844041824" g="0.05087608844041824" />
+  </environment>
+</scene>
