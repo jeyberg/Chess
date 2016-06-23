@@ -1,0 +1,52 @@
+<scene formatVersion="1.0.1" exported_by="Martin Watolla" previous_export_time="1466687160.6764936" export_time="1466687427.665092" >
+  <nodes >
+    <node name="pferdW" >
+      <position z="-0.000000" y="-9.892020" x="0.000000" />
+      <rotation qx="0.000000" qz="-0.000000" qy="0.000000" qw="1.000000" />
+      <scale z="1.000000" y="1.000000" x="1.000000" />
+      <game >
+        <sensors />
+        <actuators />
+      </game>
+      <entity mass="1.0" actor="False" lock_trans_y="False" friction_y="1.0" velocity_max="0.0" meshFile="Plane.mesh" damping_rot="0.10000000149011612" mass_radius="1.0" lock_trans_x="False" lock_rot_x="False" friction_x="1.0" lock_rot_y="False" name="Plane" lock_trans_z="False" ghost="False" lock_rot_z="False" physics_type="STATIC" inertia_tensor="0.4000000059604645" velocity_min="0.0" friction_z="1.0" damping_trans="0.03999999910593033" anisotropic_friction="False" />
+    </node>
+    <node name="Lamp" >
+      <position z="-1.005454" y="5.903862" x="4.076245" />
+      <rotation qx="0.169076" qz="-0.272171" qy="0.755880" qw="0.570947" />
+      <scale z="1.000000" y="1.000000" x="1.000000" />
+      <game >
+        <sensors />
+        <actuators />
+      </game>
+      <light type="point" name="Lamp" powerScale="1.0" shadow="true" >
+        <position z="-1.005454" y="5.903862" x="4.076245" />
+        <lightAttenuation range="5000" quadratic="0.0" constant="1.0" linear="0.03333335240683057" />
+        <colourDiffuse b="1.0" g="1.0" r="1.0" />
+        <colourSpecular b="1.0" g="1.0" r="1.0" />
+        <colourShadow b="1.0" g="1.0" r="1.0" />
+      </light>
+    </node>
+    <node name="Camera" >
+      <position z="6.507640" y="5.343665" x="7.481132" />
+      <rotation qx="0.481707" qz="-0.212922" qy="0.334251" qw="0.781600" />
+      <scale z="1.000000" y="1.000000" x="1.000000" />
+      <game >
+        <sensors />
+        <actuators />
+      </game>
+      <camera projectionType="perspective" name="Camera" fov="0.5033799435163735" >
+        <clipping farPlaneDist="100.0" far="100.0" nearPlaneDist="0.10000000149011612" near="0.10000000149011612" />
+      </camera>
+    </node>
+  </nodes>
+  <externals >
+    <item type="material" >
+      <file name="C:\Users\Martin Watolla\Desktop\Texturen\Holz_Alt\PferdWeiss\pferdW.material" />
+    </item>
+  </externals>
+  <environment >
+    <colourAmbient b="0.0" g="0.0" r="0.0" />
+    <colourBackground b="0.05087608844041824" g="0.05087608844041824" r="0.05087608844041824" />
+    <colourDiffuse b="0.05087608844041824" g="0.05087608844041824" r="0.05087608844041824" />
+  </environment>
+</scene>
