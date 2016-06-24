@@ -203,44 +203,44 @@ public class GeometrieKonstruktor {
         Geometry g = null;
             if (type.equals("Turm")) {
                 if(istWeiss){
-                    g = getGeometryFromSpatial(assetManager.loadModel("Models/holz_neu/turmWeiss/turm.j3o"));
+                    g = getGeometryFromSpatial(assetManager.loadModel("Models/holz_neu/turmW/turmW.j3o"));
                 }else{
-                    g = getGeometryFromSpatial(assetManager.loadModel("Models/holz_neu/turmSchwarz/turm.j3o"));
+                    g = getGeometryFromSpatial(assetManager.loadModel("Models/holz_neu/turmS/turmS.j3o"));
                 }  
                 g.setUserData("rang", "d");
             } else if (type.equals("Springer")) {
                 if(istWeiss){
-                    g = getGeometryFromSpatial(assetManager.loadModel("Models/holz_neu/springerWeiss/springer.j3o"));
+                    g = getGeometryFromSpatial(assetManager.loadModel("Models/holz_neu/springerW/springerW.j3o"));
                 }else{
-                    g = getGeometryFromSpatial(assetManager.loadModel("Models/holz_neu/springerSchwarz/springer.j3o"));
+                    g = getGeometryFromSpatial(assetManager.loadModel("Models/holz_neu/springerS/springerS.j3o"));
                 }  
                 g.setUserData("rang", "b");
             } else if (type.equals("Laeufer")) {
                 if(istWeiss){
-                    g = getGeometryFromSpatial(assetManager.loadModel("Models/holz_neu/bauerWeiss/bauer.j3o"));
+                    g = getGeometryFromSpatial(assetManager.loadModel("Models/holz_neu/pferdW/pferdW.j3o"));
                 }else{
-                    g = getGeometryFromSpatial(assetManager.loadModel("Models/holz_neu/bauerSchwarz/bauer.j3o"));
+                    g = getGeometryFromSpatial(assetManager.loadModel("Models/holz_neu/pferdS/pferdS.j3o"));
                 }  
                 g.setUserData("rang", "c");
             } else if (type.equals("Koenig")) {
                 if(istWeiss){
-                    g = getGeometryFromSpatial(assetManager.loadModel("Models/holz_neu/koenigWeiss/koenig.j3o"));
+                    g = getGeometryFromSpatial(assetManager.loadModel("Models/holz_neu/koenigW/koenigW.j3o"));
                 }else{
-                    g = getGeometryFromSpatial(assetManager.loadModel("Models/holz_neu/koenigSchwarz/koenig.j3o"));
+                    g = getGeometryFromSpatial(assetManager.loadModel("Models/holz_neu/koenigS/koenigS.j3o"));
                 }  
                 g.setUserData("rang", "f");
             } else if (type.equals("Dame")) {
                 if(istWeiss){
-                    g = getGeometryFromSpatial(assetManager.loadModel("Models/holz_neu/dameWeiss/dame.j3o"));
+                    g = getGeometryFromSpatial(assetManager.loadModel("Models/holz_neu/dameW/dameW.j3o"));
                 }else{
-                    g = getGeometryFromSpatial(assetManager.loadModel("Models/holz_neu/dameSchwarz/dame.j3o"));
+                    g = getGeometryFromSpatial(assetManager.loadModel("Models/holz_neu/dameS/dameS.j3o"));
                 }  
                 g.setUserData("rang", "e");
             } else if (type.equals("Bauer")) {
                 if(istWeiss){
-                    g = getGeometryFromSpatial(assetManager.loadModel("Models/holz_neu/bauerWeiss/bauer.j3o"));
+                    g = getGeometryFromSpatial(assetManager.loadModel("Models/holz_neu/bauerW/bauerW.j3o"));
                 }else{
-                    g = getGeometryFromSpatial(assetManager.loadModel("Models/holz_neu/bauerSchwarz/bauer.j3o"));
+                    g = getGeometryFromSpatial(assetManager.loadModel("Models/holz_neu/bauerS/bauerS.j3o"));
                 }                        
                 g.setUserData("rang", "a");
                 g.setName("Bauer");
