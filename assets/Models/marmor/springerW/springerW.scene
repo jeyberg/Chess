@@ -1,0 +1,59 @@
+<scene export_time="1466793905.2138069" exported_by="Martin Watolla" previous_export_time="1466694500.3428886" formatVersion="1.0.1" >
+  <nodes >
+    <node name="springerW" >
+      <position x="0.000000" y="-12.870675" z="-0.000000" />
+      <rotation qw="1.000000" qx="0.000000" qz="-0.000000" qy="0.000000" />
+      <scale x="1.000000" y="1.000000" z="1.000000" />
+      <user_data type="IDPropertyGroup" value='&lt;bpy id prop: owner="OBspringerW", name="cycles", address=0x0000008C7BA74118&gt;' name="cycles" />
+      <user_data type="IDPropertyGroup" value='&lt;bpy id prop: owner="OBspringerW", name="cycles_visibility", address=0x0000008C7BA739C8&gt;' name="cycles_visibility" />
+      <game >
+        <sensors />
+        <actuators />
+      </game>
+      <entity lock_trans_z="False" friction_y="1.0" velocity_max="0.0" velocity_min="0.0" lock_rot_z="False" friction_x="1.0" inertia_tensor="0.4000000059604645" mass="1.0" name="Plane" mass_radius="1.0" lock_rot_x="False" lock_trans_y="False" ghost="False" lock_trans_x="False" damping_rot="0.10000000149011612" damping_trans="0.03999999910593033" actor="False" lock_rot_y="False" anisotropic_friction="False" physics_type="STATIC" meshFile="Plane.mesh" friction_z="1.0" >
+        <user_data type="IDPropertyGroup" value='&lt;bpy id prop: owner="MEPlane", name="cycles", address=0x0000008C7BA73B78&gt;' name="cycles" />
+      </entity>
+    </node>
+    <node name="Lamp" >
+      <position x="4.076245" y="5.903862" z="-1.005454" />
+      <rotation qw="0.570947" qx="0.169076" qz="-0.272171" qy="0.755880" />
+      <scale x="1.000000" y="1.000000" z="1.000000" />
+      <user_data type="IDPropertyGroup" value='&lt;bpy id prop: owner="OBLamp", name="cycles", address=0x0000008C7BA747D8&gt;' name="cycles" />
+      <user_data type="IDPropertyGroup" value='&lt;bpy id prop: owner="OBLamp", name="cycles_visibility", address=0x0000008C7BA73ED8&gt;' name="cycles_visibility" />
+      <game >
+        <sensors />
+        <actuators />
+      </game>
+      <light type="point" powerScale="1.0" shadow="true" name="Lamp" >
+        <position x="4.076245" y="5.903862" z="-1.005454" />
+        <lightAttenuation range="5000" constant="1.0" linear="0.03333335240683057" quadratic="0.0" />
+        <colourDiffuse g="1.0" b="1.0" r="1.0" />
+        <colourSpecular g="1.0" b="1.0" r="1.0" />
+        <colourShadow g="1.0" b="1.0" r="1.0" />
+      </light>
+    </node>
+    <node name="Camera" >
+      <position x="7.481132" y="5.343665" z="6.507640" />
+      <rotation qw="0.781600" qx="0.481707" qz="-0.212922" qy="0.334251" />
+      <scale x="1.000000" y="1.000000" z="1.000000" />
+      <user_data type="IDPropertyGroup" value='&lt;bpy id prop: owner="OBCamera", name="cycles", address=0x0000008C7BA738A8&gt;' name="cycles" />
+      <game >
+        <sensors />
+        <actuators />
+      </game>
+      <camera projectionType="perspective" fov="0.5033799435163735" name="Camera" >
+        <clipping farPlaneDist="100.0" nearPlaneDist="0.10000000149011612" near="0.10000000149011612" far="100.0" />
+      </camera>
+    </node>
+  </nodes>
+  <externals >
+    <item type="material" >
+      <file name="C:\Users\Martin Watolla\Desktop\Texturen\Marmor\SpringerWeiss\springerW.material" />
+    </item>
+  </externals>
+  <environment >
+    <colourDiffuse g="0.05087608844041824" b="0.05087608844041824" r="0.05087608844041824" />
+    <colourAmbient g="0.0" b="0.0" r="0.0" />
+    <colourBackground g="0.05087608844041824" b="0.05087608844041824" r="0.05087608844041824" />
+  </environment>
+</scene>
